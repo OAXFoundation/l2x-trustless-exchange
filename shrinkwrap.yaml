@@ -182,7 +182,7 @@ importers:
       ramda: 0.25.0
       shell-quote: 1.6.1
     specifiers:
-      '@oax/common': 0.3.3
+      '@oax/common': 0.3.4
       await-outside: 2.1.2
       bignumber.js: 8.1.1
       bluebird: 3.5.4
@@ -208,6 +208,7 @@ importers:
       knex: 0.17.6
       path-to-regexp: 2.4.0
       ramda: 0.25.0
+      sqlite3: 4.0.8
       winston: 2.4.4
     specifiers:
       ajv: 6.6.2
@@ -218,6 +219,7 @@ importers:
       knex: 0.17.6
       path-to-regexp: 2.4.0
       ramda: ^0.25.0
+      sqlite3: 4.0.8
       winston: 2.4.4
 packages:
   /@babel/code-frame/7.0.0:

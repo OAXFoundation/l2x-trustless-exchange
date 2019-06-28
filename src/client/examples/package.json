@@ -1,12 +1,12 @@
 {
   "name": "CLISample",
   "description": "OAX CLI Sample",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "author": "OAX Foundation",
   "license": "MIT",
   "main": "index.js",
   "dependencies": {
-    "@oax/client": "0.3.3",
+    "@oax/client": "0.3.4",
     "await-outside": "2.1.2",
     "bignumber.js": "^8.1.1",
     "blessed": "^0.1.81",

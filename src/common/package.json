@@ -1,7 +1,7 @@
 {
   "name": "@oax/common",
   "description": "OAX Trustless Common Components",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "author": "OAX Foundation",
   "license": "MIT",
   "main": "index.js",
@@ -15,6 +15,7 @@
     "ethereumjs-util": "6.0.0",
     "ethers": "4.0.27",
     "jsonapi-serializer": "3.6.4",
+    "sqlite3": "4.0.8",
     "knex": "0.17.6",
     "path-to-regexp": "2.4.0",
     "ramda": "^0.25.0",
