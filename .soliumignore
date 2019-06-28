@@ -1,0 +1,3 @@
+node_modules
+src/contracts/Migrations.sol
+src/contracts/openzeppelin-solidity/contracts/math/SafeMath.sol

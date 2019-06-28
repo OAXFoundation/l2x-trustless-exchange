@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+set -e
+
+echo "Building client package"
+
+# Build @oax/client package
+cp -r build/dist/src/client build/
+cp -r src/client/cli build/client/
+cp src/client/package.json build/client/
+cp README.md build/client/
+
+# Build @oax/common package
+cp -r build/dist/src/common/ build/
+
+mkdir -p build/common/build/contracts
+cp -r build/contracts/{Mediator.abi,ERC20.abi} build/common/build/contracts/
+touch build/common/.contract_build_root
+
+mkdir -p build/common/src/contracts
+cp -r src/contracts/wrappers/ build/common/contracts
+
+cp src/common/package.json build/common/

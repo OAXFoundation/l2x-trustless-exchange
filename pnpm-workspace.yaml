@@ -1,0 +1,8 @@
+packages:
+  # the root package.json
+  - "."
+  - "build/client"
+  - "build/common"
+
+  # exclude packages in subdirs of src/
+  - "!src/**"

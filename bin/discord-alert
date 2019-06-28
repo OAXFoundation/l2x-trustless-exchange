@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+#
+#  Usage ./discord-alert user message
+url='https://discordapp.com/api/webhooks/538180254905270282/WhEUsv3D2ILH2cD_WCoRHtQ1gj_qfJUEhPMSW2Fn5iMJS48Rxvu2FbKz8jl10fkwRX2q'
+curl -H "Content-Type: application/json" \
+    -X POST \
+    -d "{\"username\": \"$1\", \"content\": \"$2\"}" \
+    $url

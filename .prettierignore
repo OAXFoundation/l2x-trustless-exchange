@@ -1,0 +1,6 @@
+*.json
+src/contracts/wrappers/
+node_modules/
+build/
+.npm-store/
+*.d.ts

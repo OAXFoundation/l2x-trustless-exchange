@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+set -euxo pipefail
+
+DEPLOYER_ADDRESS="0x$(cat wallet/deploy.bin | jq -r .address)"
+fund-wallet $DEPLOYER_ADDRESS 100e18
+
+OPERATOR_ADDRESS="0x$(cat wallet/wallet.bin | jq -r .address)"
+fund-wallet $OPERATOR_ADDRESS 100e18
+
+pnpm run clean-build
+docker_build.sh
+
+echo testtest | deployContracts.js
+
+# capture token addresses
+CONTRACT_OAXToken=$(cat deploy.json | jq -r .assets.OAX)
+CONTRACT_WETHToken=$(cat deploy.json | jq -r .assets.WETH)
+CONTRACT_Mediator=$(cat deploy.json | jq -r .mediator)
+FEE_AMOUNT_ETHER=$(cat .env.example | grep FEE_AMOUNT_ETHER | cut -d = -f 2)
+
+docker stop oax-e2e || true
+docker rm oax-e2e || true
+
+docker run --init -it \
+        -v $(pwd)/wallet:/app/mount \
+        -p 8899:8899 \
+        -e GETH_RPC_URL="http://oax-test-geth:8545" \
+        -e WALLET_FILEPATH="/app/mount/wallet.bin" \
+        -e WALLET_PASSWORD="testtest" \
+        -e STORAGE_DIR="/app/storage" \
+        -e FEE_AMOUNT_ETHER=$FEE_AMOUNT_ETHER \
+        -e CONTRACT_OAXToken=$CONTRACT_OAXToken \
+        -e CONTRACT_ETHToken=$CONTRACT_WETHToken \
+        -e CONTRACT_Mediator=$CONTRACT_Mediator \
+        -e IN_MEMORY_DB=1\
+        -e E2E_TEST=1 \
+        --network oax-test-network \
+        --name oax-e2e \
+        oax/server:latest

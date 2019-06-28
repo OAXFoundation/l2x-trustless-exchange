@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+# ensure the .env file is available for development
+
+if [[ ! -e .env ]]; then
+  cp .env.example .env
+fi
+
+hivemind

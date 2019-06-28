@@ -1,0 +1,210 @@
+@startuml
+!pragma teoz true
+
+title Unidirectional transfer between two participants through Operator
+
+actor Alice as A
+
+box "Hub " #LightBlue
+    participant "Operator\n(Off-Chain)" as O
+    participant "Mediator\n(On-Chain)" as V
+end box
+
+actor Bob as B
+
+group Entry (during some round ""r"")
+    note over A
+        **""update_alice(r)""**
+            ""H(∅, 0, 0)""
+
+        **sig**""(update_alice(r), alice_key)""
+    end note
+
+    A -> O: Join Hub
+    activate O
+
+    O -> O: Verify **update_alice** represents an empty balance
+
+    note over O
+        **sig**""(update_alice(r), operator_key)""
+    end note
+
+    O -> A: Countersigns **update_alice**
+    deactivate O
+
+
+    note over B
+        **""update_i(r)""**
+            ""H(∅, 0, 0)""
+
+        **sig**""(update_i(r), alice_key)""
+    end note
+
+    B -> O: Join Hub
+    activate O
+
+    O -> O: Verify **update_bob** represents an empty balance
+
+    note over O
+        **sig**""(update_bob(r), operator_key)""
+    end note
+
+    O -> B: Countersigns **update_bob**
+    deactivate O
+
+end
+
+group Deposit
+    note over A
+        ""n"" ETH
+    end note
+
+    A -> V: on-chain transfer
+
+    A -> A: Credit's deposit by ""n""
+
+    V -> O: notify deposit
+
+    O -> O: Credits Alice's deposit by ""n""
+
+
+end
+
+group Transfer [Alice sending ""amt"" ETH to Bob during round ""r""]
+
+    note over A
+        **transfer**
+            ""<round, Alice, Bob, amt>""
+
+        **update_alice**
+            ""H(T_alice(r), amt, 0)""
+
+        **sig**""(update_alice, alice_key)""
+    end note
+
+    A -> O: Off-chain Transfer
+
+
+    note over A
+    **transfer**
+        ""<round, Alice, Bob, amt>""
+    end note
+
+    A -> B: Notify transfer
+
+
+    note over B
+    **transfer**
+            ""<round, Alice, Bob, amt>""
+
+    **update_bob**
+        ""H(T_bob(r), amt, 0)""
+
+    **sig**""(update_bob, bob_key)""
+    end note
+
+    B -> O: Acknowledge transfer
+
+    note left O
+        **sig**""(update_alice, operator_key)""
+    end note
+
+    note right O
+        **sig**""(update_bob, operator_key)""
+    end note
+
+    O -> O: Verify **transfer** in \n **update_alice** and **update_bob**
+
+    O -> A: Transfer confirmation
+    & O -> B: Transfer confirmation
+end
+
+group Synchronization [Must take place in the first quarter of every round]
+    note over O
+        **openingBalance merkle tree root**
+          ""T(r)""
+    end note
+
+    O -> V: Commits openingBalance merkle tree
+
+    V -> V: Validates preconditions and invariants
+
+    note left O
+        **Proof of Stake**
+            ""𝜏_alice(r)""
+    end note
+
+    note right O
+        **Proof of Stake**
+            ""𝜏_bob(r)""
+    end note
+
+    O -> A: Deliver proof of stake (**𝜏_alice**)
+    & O -> B: Deliver proof of stake (**𝜏_bob**)
+
+    note over A
+        **Proof of Stake**
+            ""𝜏_alice(r)""
+    end note
+    A -> V: Verify proof of stake (**𝜏_alice**)
+    activate V
+    V --> A: verification result
+    deactivate V
+
+    alt valid proof of stake
+      A -> A: Stores proof of stake **𝜏_alice**
+    else invalid proof of stake
+      A -> V: Open Balance Dispute
+    end
+
+    note over B
+        **Proof of Stake**
+            ""𝜏_bob(r)""
+    end note
+    B -> V: Verify proof of stake (**𝜏_bob**)
+    activate V
+    V --> B: verification result
+    deactivate V
+
+    alt valid proof of stake
+      B -> B: Stores proof of stake **𝜏_bob**
+    else invalid proof of stake
+      B -> V: Open Balance Dispute
+    end
+end
+
+group Withdrawal [Alice wants to withdraw ""w"" amount in round ""r""]
+
+    A -> A: Verify withdrawal preconditions
+    activate A
+
+    A -> A: **""r""** != Alice's first round
+    A -> A: Has valid proof of stake **""𝜏_alice(r-1)""**
+    A -> A: Verify ""A(r-1)"" < ""w""
+
+    note over A
+        **amount**
+            ""w""
+        **proof of stake**
+            ""𝜏_alice(r-1)""
+    end note
+
+    A -> V: Initiate withdrawal
+
+    activate V
+    V -> V: Verify **Hub** not in recovery mode
+    V -> V: Verify **Alice** has no pending withdrawal
+    V -> V: Validate proof of stake **""𝜏_alice(r-1)""**
+    V -> V: Validate withdrawal amount ""w"" <= ""A_alice(r-1)""
+    V -> V: Set pending withdrawal ""W_alice(r)"" to ""w""
+    deactivate V
+    deactivate A
+
+    ... 2 rounds passed ...
+
+    A -> V: confirm withdrawal
+
+
+end
+
+@enduml

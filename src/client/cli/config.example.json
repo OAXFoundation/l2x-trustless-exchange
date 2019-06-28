@@ -1,0 +1,14 @@
+{
+    "hubUrl": "http://13.209.182.161:8899/",
+    "providerUrl": "https://rinkeby.infura.io/v3/<infura-project-id>",
+    "operatorAddress": "0xed1EaF99cF2a0899b9D5348c5d423b1b101d8377",
+    "mediatorAddress": "0xB3B4Ee6A170f5973ba2d474D54B5B9b15aaA60Cb",
+    "assets": {
+        "WETH": "0xc778417E063141139Fce010982780140Aa0cD5Ab",
+        "OAX": "0xFde9e33691393B75aB8c4E8f0668D5eA4145E165"
+    },
+    "fee": {
+      "asset": "OAX",
+      "amount": "0.00001"
+    }
+}

@@ -1,0 +1,9 @@
+getWalletAddress
+deposit OAX 0.000000000000000002
+fetchOrderBook 'WETH/OAX'
+fetchTrades 'WETH/OAX'
+fetchBalances
+fetchOrders
+fetchOrder 0
+createOrder SELL 'OAX/WETH' 0.000000000000000001 1
+requestWithdrawal OAX 0.000000000000000001

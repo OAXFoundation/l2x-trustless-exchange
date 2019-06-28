@@ -1,0 +1,57 @@
+@startuml
+
+package "Layer 3: Applications" {
+    package "Exchange Stack" #SkyBlue {
+        [Exchange Server] as ExchangeServer
+    }
+
+    package "Exchange Client Stack" #Lavender {
+        [CLI]
+        [Exchange Client Library] as ExchangeClient
+    }
+}
+
+package "Layer 2: L2X Protocol" {
+    package "Exchange Stack " #SkyBlue {
+        [Operator] as Operator
+    }
+
+    package "Exchange Client Stack " #Lavender {
+            [L2 Client Library] as L2Client
+    }
+}
+
+package "Layer 1: Blockchain" {
+    [Mediator] as Mediator
+}
+
+'--------------------
+' Layer 3
+'--------------------
+' Between layers
+ExchangeServer -down-> Operator: Internal API
+ExchangeClient -down-> L2Client: Internal API
+ExchangeClient -left-> ExchangeServer: Public API
+
+' Within layer
+CLI -left-> [ExchangeClient]: Method call
+
+
+'--------------------
+' Layer 2
+'--------------------
+
+' Between layers
+L2Client -down-> Mediator: contract calls
+Operator -down-> Mediator: contract calls
+L2Client -left-> Operator: Public API
+
+'--------------------
+' Layer 1
+'--------------------
+
+' Between layers
+Mediator -up-> Operator: events
+Mediator -up-> L2Client: events
+
+@enduml

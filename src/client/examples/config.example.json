@@ -1,0 +1,15 @@
+{
+    "hubUrl": "http://127.0.0.1:8899",
+    "providerUrl": "http://127.0.0.1:8545",
+    "operatorAddress": "",
+    "mediatorAddress": "",
+    "assets": {
+        "OAX": "",
+        "WETH": ""
+    },
+    "fee": {
+        "asset": "OAX",
+        "amount": "0.00001"
+    },
+    "walletFile": "wallet.bin"
+}

@@ -1,0 +1,6 @@
+getWalletAddress
+fetchOrderBook 'WETH/OAX'
+fetchTrades 'WETH/OAX'
+fetchBalances
+fetchOrders
+fetchOrder 0

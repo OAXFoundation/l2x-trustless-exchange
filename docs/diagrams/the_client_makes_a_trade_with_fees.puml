@@ -1,0 +1,94 @@
+@startuml
+
+actor WebClient
+actor L2Client
+database Events
+database Mediator
+actor Exchange
+actor Operator
+
+== ROUND 0 ==
+
+== Client joins and deposits 5ETH and 1000 OAX (for fees)  ==
+
+WebClient -> L2Client: "I want to deposit 5 ETH"
+note right
+Hence the L2Client needs access to
+the private key / signing abilities of the Client
+end note
+
+L2Client -> Mediator: V.depositTokens(5 ETH)
+
+Operator -> Events: List of Deposits?
+Events -> Operator: (WebClient, 5 ETH)
+
+Operator -> Operator: Update Balances ETH / BTC / OAX
+
+
+WebClient -> L2Client: "I want to deposit 1000 OAX"
+
+L2Client -> Mediator: V.depositTokens(1000 OAX)
+
+Operator -> Events: List of Deposits?
+Events -> Operator: (WebClient, 1000 OAX)
+
+Operator -> Operator: Update Balances ETH / BTC / OAX
+
+== ROUND 1 ==
+
+== Operator commits to new root ==
+
+Operator -> Operator: rootETH = getRootFromAccounts(ETH)
+Operator -> Mediator: V.commit(rootETH, ETH)
+
+Operator -> Operator: rootBTC = getRootFromAccounts(BTC)
+Operator -> Mediator: V.commit(rootBTC, BTC)
+
+Operator -> Operator: rootOAX = getRootFromAccounts(OAX)
+Operator -> Mediator: V.commit(rootOAX, OAX)
+
+Operator -> L2Client: [ProofETH1, ProofBTC1, ProofOAX1]
+
+
+== Client wants to trade 2 ETH for 3 BTC. Fee is 10 OAX  ==
+
+WebClient -> Exchange: a1=Approval("buy":3 BTC, "sell":2 ETH), a2= Approval("buy":0 OAX,"sell":10 OAX)
+
+Exchange -> Exchange: check WebClient has enough funds for a1 and that a2 contains enough fee
+
+Exchange -> Exchange: t1=Trade("buy": 3.1 BTC, "sell":2 ETH), t2= Trade("buy":0 OAX,"sell":10 OAX)
+
+Exchange -> Operator: t1, t2, a1, a2
+
+
+note right
+The operator receives the trades and convert then to
+(signed) fills before sending these fills back to the exchange.
+end note
+Operator -> Exchange: f1=TradeToFill(f1), f2=TradeToFill(f2)
+
+Exchange -> L2Client: f1, f2
+
+Exchange -> WebClient: t1,t2
+
+== ROUND 2 ==
+
+== Operator commits to new root ==
+note right
+For the client the new balance is:
+ BTC: 3.1
+ ETH: 3
+ OAX: 990
+end note
+
+Operator -> Operator: rootETH = getRootFromAccounts(ETH)
+Operator -> Operator: rootBTC = getRootFromAccounts(BTC)
+Operator -> Operator: rootOAX = getRootFromAccounts(OAX)
+
+Operator -> Mediator: V.commit(rootETH, ETH)
+Operator -> Mediator: V.commit(rootBTC, BTC)
+Operator -> Mediator: V.commit(rootOAX, OAX)
+
+Operator -> L2Client: [ProofETH2, ProofBTC2, ProofOAX2]
+
+@enduml

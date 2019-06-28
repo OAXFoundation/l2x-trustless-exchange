@@ -1,0 +1,25 @@
+{
+  "extends": "solium:all",
+  "rules": {
+    "quotes": [
+      "error",
+      "double"
+    ],
+    "indentation": [
+      "error",
+      4
+    ],
+    "uppercase": [
+      "off"
+    ],
+    "error-reason": [
+      "off"
+    ],
+    "function-whitespace": [
+      "off"
+    ],
+    "operator-whitespace" : [
+      "off"
+    ]
+  }
+}

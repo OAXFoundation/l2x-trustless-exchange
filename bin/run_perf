@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+NODE_ENV=perf node build/dist/demo/PerformanceDemo 2>> perf.log

@@ -1,0 +1,43 @@
+{
+  "name": "@oax/client",
+  "description": "OAX Trustless Client",
+  "version": "0.3.3",
+  "author": "OAX Foundation",
+  "license": "MIT",
+  "main": "index.js",
+  "scripts": {
+    "oax": "node ./cli/client-cli.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/OAXFoundation/l2x-trustless-exchange"
+  },
+  "bin": {
+    "oax": "./cli/client-cli.js"
+  },
+  "keywords": [
+    "oax",
+    "dex",
+    "trustless",
+    "exchange",
+    "crypto"
+  ],
+  "dependencies": {
+    "cross-fetch": "2.2.3",
+    "@oax/common": "0.3.3",
+    "ramda": "0.25.0",
+    "knex": "0.17.6",
+    "eventemitter3": "3.1.0",
+    "ethers": "4.0.27",
+    "minimist": "1.2.0",
+    "bignumber.js": "8.1.1",
+    "colors": "1.3.3",
+    "moment": "2.24.0",
+    "promptly": "3.0.3",
+    "shell-quote": "1.6.1",
+    "get-stdin": "6.0.0",
+    "prompt": "1.0.0",
+    "bluebird": "3.5.4",
+    "await-outside": "2.1.2"
+  }
+}

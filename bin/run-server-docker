@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+docker rm oax
+
+# only works on linux
+
+docker run -it \
+        --network host \
+        -v $(pwd)/wallet:/app/mount \
+        -e GETH_RPC_URL="http://127.0.0.1:8545" \
+        -e WALLET_FILEPATH="/app/mount/wallet.bin" \
+        -e WALLET_PASSWORD="blah" \
+        -e STORAGE_DIR="/app/storage" \
+        -e FEE_AMOUNT_ETHER="0.0000001" \
+        -e CONTRACT_OAXToken="0xc01fB66f5F007c7f94bF7Be91f639006360A7fdC" \
+        -e CONTRACT_ETHToken="0x6C7D80b22FE1815e7630589ed9991b83C6Ba2a64" \
+        -e CONTRACT_Mediator="0x65045CfFc0E7eA83917eD126F0EbFBf1D5A4C7a1" \
+        --name oax \
+        oax/server:latest

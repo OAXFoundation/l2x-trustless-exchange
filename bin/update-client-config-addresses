@@ -1,0 +1,35 @@
+#!/usr/bin/env node
+// ----------------------------------------------------------------------------
+// Copyright (c) 2018,2019 OAX Foundation.
+// https://www.oax.org/
+// See LICENSE file for license details.
+// ----------------------------------------------------------------------------
+const fs = require('fs')
+
+const configPath = process.argv[2]
+const deployPath = process.argv[3]
+
+function usage() {
+  console.error('Usage: update-client-config-addresses config.json deploy.json')
+}
+
+if (!deployPath || !configPath) {
+  usage()
+  process.exit(1)
+}
+
+const deploy = JSON.parse(fs.readFileSync(deployPath))
+const config = JSON.parse(fs.readFileSync(configPath))
+
+if (!deploy.mediator || !deploy.operator) {
+  usage()
+  process.exit(1)
+}
+
+config.assets = deploy.assets
+config.mediatorAddress = deploy.mediator
+config.operatorAddress = deploy.operator
+
+fs.writeFileSync(configPath, JSON.stringify(config, null, 2))
+
+console.log(`Updated ${configPath} with addresses from ${deployPath}`)

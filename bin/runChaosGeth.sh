@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+DATA_DIR=~/.ethereum/oax-chaos
+
+# Remove existing test folder
+if [ -d $DATA_DIR ]; then
+   echo "Removing existing geth data folder..."
+   rm -r $DATA_DIR
+fi
+
+# Create data folder
+mkdir -p $DATA_DIR
+
+# Generate new private key
+echo -n "" > $DATA_DIR/testpassword.txt
+for i in `seq 1 5`;
+do
+   echo "testtest" >> $DATA_DIR/testpassword.txt
+   geth --verbosity 0 --datadir $DATA_DIR account new --password $DATA_DIR/testpassword.txt
+done
+
+# Generate a new genesis file
+node bin/generate_chaos_genesis_poa.js
+
+# Create new chain
+geth --datadir $DATA_DIR init $DATA_DIR/genesis_poa.json
+
+# Get list of wallets
+ADDRESS_LIST=$(geth --verbosity 0 --datadir $DATA_DIR account list | cut -d ' ' -f 3 | cut -c2- | rev | cut -c2- | rev | sed -e 's/^/0x/' | sed '$!s/$/,/' | tr -d '\n')
+
+# Run geth
+args="--nousb --networkid 88 --datadir ${DATA_DIR} --unlock ${ADDRESS_LIST} --password ${DATA_DIR}/testpassword.txt --rpc --rpccorsdomain '*' --rpcport 8545 --rpcapi 'admin,db,shh,txpool,personal,eth,net,web3,debug'  --mine --minerthreads 1 --maxpeers 0 --nodiscover --verbosity 3"
+
+geth --nousb --networkid 88 --datadir $DATA_DIR --unlock $ADDRESS_LIST --password $DATA_DIR/testpassword.txt --rpc --rpccorsdomain '*' --rpcport 8545 --rpcapi "admin,db,shh,txpool,personal,eth,net,web3,debug" --mine --minerthreads 1 --maxpeers 0 --nodiscover
+

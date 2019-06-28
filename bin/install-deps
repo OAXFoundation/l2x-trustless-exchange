@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -exu
+
+# ensure packages are in place
+mkdir -p build/{client,common}
+
+mkdir -p build/client/cli
+touch build/client/cli/client-cli.js
+
+cp src/client/package.json build/client/
+cp src/common/package.json build/common/
+
+pnpm install -r

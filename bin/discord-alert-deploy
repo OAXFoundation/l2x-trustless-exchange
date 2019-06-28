@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+discord-alert cli-deploy "deployed $(git log -1 --pretty=format:'%h %s')"

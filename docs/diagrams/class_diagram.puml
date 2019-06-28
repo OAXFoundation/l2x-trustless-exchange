@@ -1,0 +1,58 @@
+@startuml
+
+
+' Client
+
+
+class HTTPClient
+note right
+ This class can be used to connect
+ to the server which services
+ are described in the
+ <b>HTTPServer</b> class.
+end note
+
+
+class ExchangeClient
+class L2Client
+
+' Common
+class MetaLedger
+class SolvencyTree
+class IMediatorAsync
+class MediatorAsync
+
+
+' Server
+class Exchange
+
+
+' not a class  but a module
+
+class Operator
+class HTTPServer
+
+
+' Relations
+
+ExchangeClient -- HTTPClient: uses >
+ExchangeClient -- L2Client: has >
+L2Client -- MetaLedger: uses >
+Exchange -- MetaLedger: has >
+Exchange -- Operator: has >
+Operator -- MetaLedger: uses >
+MetaLedger -- SolvencyTree: uses >
+MediatorAsync -up- IMediatorAsync: implements >
+
+L2Client -- IMediatorAsync: uses >
+Operator -- IMediatorAsync: has >
+
+HTTPServer -- Operator: has >
+HTTPServer -up- Exchange: has >
+
+
+
+@enduml
+
+
+' Operator -- Exchange : administrates >

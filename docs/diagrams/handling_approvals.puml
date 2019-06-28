@@ -1,0 +1,41 @@
+@startuml
+:new approval;
+:send to exchange;
+
+:aggregate existing total
+ sell amount for asset;
+  note right
+    existing approvals
+    of user
+  end note
+
+if (total sell amount <= asset balance ) then
+  -> yes;
+
+:store new received approval;
+
+:select matching approvals;
+  note right: with existing approvals
+
+:compute fillable amounts;
+  note right: with previous fills
+
+:sort by priority (price, time);
+
+:compute swap amounts;
+
+:create trades;
+  note left: store trades
+
+:create fills;
+
+:sign fills;
+  note left: store signed fills
+
+else
+  -[#red,dotted]-> no;
+  :reject approval;
+endif
+
+@enduml
+

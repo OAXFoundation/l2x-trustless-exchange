@@ -1,0 +1,41 @@
+@startuml
+!pragma teoz true
+
+' ------------------------------
+' Metadata
+' ------------------------------
+
+title Withdrawal State Transition
+
+' ------------------------------
+' States
+' ------------------------------
+state "Pending" as Pending
+state "Unchecked" as Unchecked
+state "Canceled" as Canceled
+state "Confirmed" as Confirmed
+
+' ------------------------------
+' Descriptions
+' ------------------------------
+
+Pending: ▼ decreases balance
+Unchecked: No change to balance
+Canceled: ⟲ revert change to balance (if any)
+Confirmed: No change to balance
+
+' ------------------------------
+' Transitions
+' ------------------------------
+
+[*] --> Pending: Client initiating withdrawal
+[*] --> Unchecked: Operator receiving withdrawal request
+
+Unchecked -left-> Pending: passes moderation
+
+Pending --> Canceled: On-chain cancellation
+Unchecked --> Canceled: fails moderation
+
+Pending --> Confirmed: On-chain confirmation
+
+@enduml

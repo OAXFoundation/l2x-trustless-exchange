@@ -1,0 +1,20 @@
+@startuml
+
+frame "Offchain" {
+  frame "Server" as Backend {
+    [Exchange]
+    [Operator]
+}
+    [Client]
+}
+
+frame "Onchain" {
+    [Mediator]
+}
+
+Operator -right-> Mediator
+Client -up-> Mediator
+Operator <-left-> Exchange
+Client -up-> Backend
+
+@enduml

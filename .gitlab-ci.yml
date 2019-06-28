@@ -1,0 +1,25 @@
+image: nixos/nix
+
+stages:
+  - test
+
+variables:
+  # Can only cache subdirectories of working directory.
+  NPM_STORE_PREFIX: "${CI_PROJECT_DIR}/.npm-store"
+
+cache:
+  key: hub-cache-0
+  paths:
+    - ".npm-store/"
+
+test:
+  tags:
+    - enuma
+  stage: test
+  script:
+    - ci/test.sh
+    # codecove is not setup skipping
+    # - nix-shell --run "pnpx codecov"
+  except:
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /skip-test/

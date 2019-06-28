@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euxo pipefail
+
+geth --exec "eth.sendTransaction({from: eth.accounts[0], to: \"$1\", value: $2})" \
+    attach http://127.0.0.1:8545

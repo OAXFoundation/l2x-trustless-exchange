@@ -1,0 +1,16 @@
+node_modules/
+.direnv/
+.idea/
+build/
+pnpm-debug.log
+src/contracts/wrappers/
+coverage/
+.env
+logs/
+.DS_Store
+storage
+deploy.json
+
+UTC--2*
+*.sqlite
+isolate-*.log

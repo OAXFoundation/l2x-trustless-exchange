@@ -1,0 +1,13 @@
+regexp=Warning:
+color=blue
+count=stop
+-
+regexp=\w*Error*:
+colours=bold red blink
+count=stop
+-
+regexp=Spanning multiple lines.
+skip=yes
+-
+regexp=.
+color=bold
