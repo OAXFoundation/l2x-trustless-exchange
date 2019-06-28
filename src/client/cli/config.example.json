@@ -1,14 +1,14 @@
 {
-    "hubUrl": "http://13.209.182.161:8899/",
-    "providerUrl": "https://rinkeby.infura.io/v3/<infura-project-id>",
-    "operatorAddress": "0xed1EaF99cF2a0899b9D5348c5d423b1b101d8377",
-    "mediatorAddress": "0xB3B4Ee6A170f5973ba2d474D54B5B9b15aaA60Cb",
-    "assets": {
-        "WETH": "0xc778417E063141139Fce010982780140Aa0cD5Ab",
-        "OAX": "0xFde9e33691393B75aB8c4E8f0668D5eA4145E165"
-    },
-    "fee": {
-      "asset": "OAX",
-      "amount": "0.00001"
-    }
+  "hubUrl": "http://13.209.182.161:8899/",
+  "providerUrl": "https://rinkeby.infura.io/v3/<infura-project-id>",
+  "operatorAddress": "0x8AB600BAe889cD50b0C06b4cefa4c158d2674a6F",
+  "mediatorAddress": "0x7EEBFAF65054A39c61d363b43CB649A6001a5D8e",
+  "assets": {
+    "WETH": "0xD9a7a22757C19581bAE6968385f0Bc9Bd6173828",
+    "OAX": "0xA5073690dc2ae3F4C5c0fbEb8f7c770D45f84898"
+  },
+  "fee": {
+    "asset": "OAX",
+    "amount": "0.00001"
+  }
 }
