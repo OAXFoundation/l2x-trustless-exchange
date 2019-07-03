@@ -16,7 +16,6 @@ import {
   AuditResult
 } from '../src/common/types/BasicTypes'
 
-import { L2Client } from '@oax/client'
 import { SolvencyTree } from '@oax/common/accounting/SolvencyTree'
 import { D, etherToD } from '@oax/common/BigNumberUtils'
 import { PrivateKeyIdentity } from '@oax/common/identity/PrivateKeyIdentity'
@@ -42,6 +41,7 @@ import { ProofCollection } from '@oax/common/persistence/ProofCollection'
 import { FillCollection } from '@oax/common/persistence/FillCollection'
 import { mkFeeFromApproval } from './libs/ApprovalUtils'
 import { mkRandomHash } from './libs/CryptoUtils'
+import { L2ClientForTest } from './libs/L2ClientForTest'
 
 describe('How the client interacts with the Operator and the Blockchain', () => {
   const operatorURL = 'https://dex.local'
@@ -56,8 +56,8 @@ describe('How the client interacts with the Operator and the Blockchain', () => 
   const bobId = new PrivateKeyIdentity()
   const bobTransport = new HTTPClient(new URL(operatorURL))
 
-  let alice: L2Client
-  let bob: L2Client
+  let alice: L2ClientForTest
+  let bob: L2ClientForTest
   let mediatorAlice: MockMediatorAsync
   let mediatorBob: MockMediatorAsync
 
@@ -75,7 +75,7 @@ describe('How the client interacts with the Operator and the Blockchain', () => 
 
     jest.spyOn(mediatorAlice, 'isHalted').mockResolvedValue(false)
 
-    alice = new L2Client(aliceId, aliceTransport, {
+    alice = new L2ClientForTest(aliceId, aliceTransport, {
       operatorAddress,
       mediator: mediatorAlice
     })
@@ -94,7 +94,7 @@ describe('How the client interacts with the Operator and the Blockchain', () => 
 
     await alice.init()
 
-    bob = new L2Client(bobId, bobTransport, {
+    bob = new L2ClientForTest(bobId, bobTransport, {
       operatorAddress,
       mediator: mediatorBob
     })
@@ -342,7 +342,7 @@ describe('How the client interacts with the Operator and the Blockchain', () => 
   })
 
   describe(`Scenario: hold back from auditing in user's first round`, () => {
-    let client: L2Client
+    let client: L2ClientForTest
 
     describe(`Given a client joining for the first time in round 1 quarter 0`, () => {
       beforeEach(async () => {
@@ -351,7 +351,7 @@ describe('How the client interacts with the Operator and the Blockchain', () => 
           .spyOn(mediatorAlice, 'getSortedListOfregisteredTokensAddresses')
           .mockResolvedValue(assets)
 
-        client = new L2Client(aliceId, aliceTransport, {
+        client = new L2ClientForTest(aliceId, aliceTransport, {
           operatorAddress,
           mediator: mediatorAlice
         })
@@ -1477,8 +1477,8 @@ describe('How the client interacts with the Operator and the Blockchain', () => 
 })
 
 function samplePartialProof(
-  client: L2Client,
-  otherClients: L2Client[],
+  client: L2ClientForTest,
+  otherClients: L2ClientForTest[],
   round: Round
 ): SolvencyTree {
   const account = {

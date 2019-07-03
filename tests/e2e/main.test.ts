@@ -30,13 +30,14 @@ import { WETH_CONTRACT_NAME } from '../libs/SystemFixture'
 import { OAX_CONTRACT_NAME } from '../libs/SystemFixture'
 import { MediatorAsync } from '../../src/common/mediator/Contracts'
 
-import { ExchangeClient, L2Client } from '@oax/client'
+import { ExchangeClient } from '@oax/client'
 import { AssetRegistry } from '../../src/common/AssetRegistry'
 import { fundWETH, fundEther } from '../../src/common/ContractUtils'
 
 import { getContract } from '../../src/common/ContractUtils'
 import { Mediator } from '../../src/contracts/wrappers/Mediator'
 import { BidAsk } from '@oax/common/types/ExchangeTypes'
+import { L2ClientForTest } from '../libs/L2ClientForTest'
 
 function doServerSetupInTest() {
   return process.env.DOCKER_E2E == undefined
@@ -46,7 +47,7 @@ const SERVER_URL = 'http://127.0.0.1:8899'
 
 async function skipToNextRound(
   mediator: MediatorAsync,
-  clients: L2Client[],
+  clients: L2ClientForTest[],
   signer: Signer
 ) {
   const round = await mediator.getCurrentRound()
@@ -59,7 +60,7 @@ async function skipToNextRound(
 
 async function skipToNextQuarter(
   mediator: MediatorAsync,
-  clients: L2Client[],
+  clients: L2ClientForTest[],
   signer: Signer
 ): Promise<void> {
   const quarter = await mediator.getCurrentQuarter()
@@ -91,8 +92,8 @@ describe('End-to-end', () => {
 
   let fixtures: SystemFixtures.SystemFixture
 
-  let aliceL2: L2Client
-  let bobL2: L2Client
+  let aliceL2: L2ClientForTest
+  let bobL2: L2ClientForTest
 
   let aliceEx: ExchangeClient
   let bobEx: ExchangeClient
@@ -238,10 +239,10 @@ describe('End-to-end', () => {
         mediator: CONTRACTS.Mediator
       }
 
-      aliceL2 = new L2Client(alice, SERVER_URL, clientOptions)
+      aliceL2 = new L2ClientForTest(alice, SERVER_URL, clientOptions)
       await aliceL2.init()
 
-      bobL2 = new L2Client(bob, SERVER_URL, clientOptions)
+      bobL2 = new L2ClientForTest(bob, SERVER_URL, clientOptions)
       await bobL2.init()
 
       const assetRegistry = new AssetRegistry()

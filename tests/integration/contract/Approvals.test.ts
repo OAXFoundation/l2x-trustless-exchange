@@ -14,16 +14,16 @@ import { IApproval } from '../../../src/common/types/Approvals'
 import { EthereumBlockchain } from '../../libs/EthereumBlockchain'
 
 import { MediatorAsync } from '../../../src/common/mediator/Contracts'
-import { L2Client } from '../../../src/client/operator/L2Client'
 import { PrivateKeyIdentity } from '../../../src/common/identity/PrivateKeyIdentity'
 import { GETH_RPC_URL } from '../../../config/environment'
 import { providers } from 'ethers'
 import { HTTPClient } from '../../../src/client/common/HTTPClient'
 import { Identity } from '../../../src/common/identity/Identity'
+import { L2ClientForTest } from '../../libs/L2ClientForTest'
 
 describe('How the Mediator validates an approval signature', () => {
   let blockchain: EthereumBlockchain
-  let alice: L2Client
+  let alice: L2ClientForTest
   let mediatorAlice: MediatorAsync
 
   let approvalParams: IApproval
@@ -53,7 +53,7 @@ describe('How the Mediator validates an approval signature', () => {
     aliceId = new PrivateKeyIdentity(undefined, provider)
     mediatorAlice = blockchain.getMediatorContract(aliceId)
 
-    alice = new L2Client(aliceId, aliceTransport, {
+    alice = new L2ClientForTest(aliceId, aliceTransport, {
       operatorAddress,
       mediator: mediatorAlice
     })

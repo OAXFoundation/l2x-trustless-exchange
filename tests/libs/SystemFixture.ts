@@ -46,8 +46,9 @@ import { IBalanceDispute } from '../../src/common/types/OperatorAndClientTypes'
 // import { ExchangeClient } from '../../src/client/exchange/ExchangeClient'
 import { loggers } from '../../src/common/Logging'
 
-import { L2Client, ExchangeClient, HTTPClient } from '@oax/client'
+import { ExchangeClient, HTTPClient } from '@oax/client'
 import { FEE_AMOUNT_WEI } from '../../config/environment'
+import { L2ClientForTest } from './L2ClientForTest'
 
 // ==============================
 // Constants
@@ -124,7 +125,7 @@ export class SystemFixture {
 
   private mediator: MediatorMock | Mediator | undefined
   public mediatorUsedByOperator: MediatorAsync | undefined
-  private clients: L2Client[]
+  private clients: L2ClientForTest[]
 
   constructor(config: SystemFixtureConfig) {
     this.config = config
@@ -593,7 +594,7 @@ export class SystemFixture {
   /**
    * Get a hub client and insert it into the fixture state
    */
-  async getClientAsync(config: SignerConfig): Promise<L2Client> {
+  async getClientAsync(config: SignerConfig): Promise<L2ClientForTest> {
     const identity = await this.getIdentityAsync(config)
 
     let httpClient: HTTPClient
@@ -605,7 +606,7 @@ export class SystemFixture {
       mediator: this.getMediatorAddress()
     }
 
-    const client = new L2Client(identity, httpClient, clientConfig)
+    const client = new L2ClientForTest(identity, httpClient, clientConfig)
 
     await client.init()
 
@@ -619,7 +620,7 @@ export class SystemFixture {
    * @param l2Client: l2 client from which we want to obtain the exchange client
    * @returns exchange client based on the l2 client and the fixture exchange
    */
-  getExchangeClient(l2Client: L2Client): ExchangeClient {
+  getExchangeClient(l2Client: L2ClientForTest): ExchangeClient {
     //Generate a different nonce for each client
     // const nonce = '0x' + randomBytes(32).toString('hex')
 
@@ -799,7 +800,7 @@ export class SystemFixture {
  * Make a wallet join the exchange
  */
 export class JoinCommand implements ExecutorCommand {
-  constructor(private readonly client: Identity | L2Client) {}
+  constructor(private readonly client: Identity | L2ClientForTest) {}
 
   async execute(fixtures: SystemFixture): Promise<void> {
     if (this.client instanceof Signer) {
@@ -856,7 +857,7 @@ export class SignerDepositCommand implements ExecutorCommand {
  */
 export class ClientDepositCommand implements ExecutorCommand {
   constructor(
-    private readonly client: L2Client,
+    private readonly client: L2ClientForTest,
     private readonly assetName: string,
     private readonly amount: Amount
   ) {}
@@ -882,7 +883,7 @@ export class ClientDepositCommand implements ExecutorCommand {
 
 export class ClientWithdrawCommand implements ExecutorCommand {
   constructor(
-    private readonly client: L2Client,
+    private readonly client: L2ClientForTest,
     private readonly assetAddress: Address,
     private readonly amount: Amount
   ) {}
@@ -903,7 +904,7 @@ export class ClientWithdrawCommand implements ExecutorCommand {
  */
 
 export class ClientAuditCommand implements ExecutorCommand {
-  constructor(private readonly client: L2Client) {}
+  constructor(private readonly client: L2ClientForTest) {}
 
   async execute(_fixtures: SystemFixture): Promise<void> {
     const auditCompleteEvent = this.client.waitForEvent('auditComplete')

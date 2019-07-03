@@ -26,7 +26,6 @@
 
 #### Accessors
 
-* [authorization](#authorization)
 * [isConnected](#isconnected)
 * [quarter](#quarter)
 * [round](#round)
@@ -35,52 +34,23 @@
 
 #### Methods
 
-* [audit](#audit)
-* [auditAsset](#auditasset)
 * [cancelOrder](#cancelorder)
-* [checkProof](#checkproof)
-* [checkProofsArray](#checkproofsarray)
 * [confirmWithdrawal](#confirmwithdrawal)
 * [createOrder](#createorder)
 * [deposit](#deposit)
-* [ensureQuarter](#ensurequarter)
-* [ensureRound](#ensureround)
-* [fetchFills](#fetchfills)
-* [fetchProofs](#fetchproofs)
-* [getBalanceTokenOffChain](#getbalancetokenoffchain)
-* [getBalanceTokenOnChain](#getbalancetokenonchain)
 * [getInstanceId](#getinstanceid)
-* [getProofAsync](#getproofasync)
-* [getRegisteredAssets](#getregisteredassets)
-* [getRoundFromBlockNumber](#getroundfromblocknumber)
-* [getSortedProofsArray](#getsortedproofsarray)
-* [goToQuarter](#gotoquarter)
-* [goToRound](#gotoround)
-* [hasAuthorization](#hasauthorization)
 * [hasFill](#hasfill)
 * [init](#init)
-* [insertFill](#insertfill)
 * [isHalted](#ishalted)
-* [isProofBalanceOk](#isproofbalanceok)
 * [join](#join)
 * [leave](#leave)
-* [makeSignedApproval](#makesignedapproval)
-* [on](#on)
-* [onNewBlockAsync](#onnewblockasync)
-* [onReceiveFillAsync](#onreceivefillasync)
-* [once](#once)
-* [openBalanceDispute](#openbalancedispute)
-* [recoverFunds](#recoverfunds)
-* [signApprovBytes](#signapprovbytes)
-* [storeProofsAsync](#storeproofsasync)
-* [waitForEvent](#waitforevent)
 * [withdraw](#withdraw)
 
 ## Constructors
 
 ###  constructor
 
-\+ **new L2Client**(`identity`: `Identity`, `transport`: [HTTPClient](httpclient.md) | string, `options`: `L2ClientOptions`): *[L2Client]()*
+\+ **new L2Client**(`identity`: `Identity`, `transport`: [HTTPClient](httpclient.md) | string, `options`: [L2ClientOptions](../interfaces/l2clientoptions.md)): *[L2Client]()*
 
 Constructor
 
@@ -90,7 +60,7 @@ Name | Type | Description |
 ------ | ------ | ------ |
 `identity` | `Identity` | A JsonRPCIdentity or PrivateKeyIdentity object for the user's wallet. |
 `transport` | [HTTPClient](httpclient.md) \| string | Used for communicating with the server. |
-`options` | `L2ClientOptions` | Various configuration options including the operatorAddress, etc.  |
+`options` | [L2ClientOptions](../interfaces/l2clientoptions.md) | Various configuration options including the operatorAddress, etc.  |
 
 **Returns:** *[L2Client]()*
 
@@ -141,16 +111,6 @@ ___
 ___
 
 ## Accessors
-
-###  authorization
-
-● **get authorization**(): *`IAuthorizationMessage`*
-
-Returns the authorization message signed by the operator when joining
-
-**Returns:** *`IAuthorizationMessage`*
-
-___
 
 ###  isConnected
 
@@ -204,34 +164,6 @@ ___
 
 ## Methods
 
-###  audit
-
-▸ **audit**(): *`Promise<void>`*
-
-Checks that the operator / mediator state is accurate else open a dispute
-
-**Returns:** *`Promise<void>`*
-
-___
-
-###  auditAsset
-
-▸ **auditAsset**(`asset`: string, `proof`: `Proof`, `round`: number): *`Promise<void>`*
-
-Audits a specific asset and throws if the audit fails
-
-**Parameters:**
-
-Name | Type | Description |
------- | ------ | ------ |
-`asset` | string | Address of the asset to audit |
-`proof` | `Proof` | Proof for the asset at the given round |
-`round` | number | Round number  |
-
-**Returns:** *`Promise<void>`*
-
-___
-
 ###  cancelOrder
 
 ▸ **cancelOrder**(`approvalId`: string): *`Promise<void>`*
@@ -243,40 +175,6 @@ Cancels an active order
 Name | Type | Description |
 ------ | ------ | ------ |
 `approvalId` | string | Order Approval ID  |
-
-**Returns:** *`Promise<void>`*
-
-___
-
-###  checkProof
-
-▸ **checkProof**(`proof`: `Proof`, `proofRound`: number): *`Promise<void>`*
-
-Checks that the proof is valid for the given round
-
-**Parameters:**
-
-Name | Type | Description |
------- | ------ | ------ |
-`proof` | `Proof` | Proof object to validate |
-`proofRound` | number | Round number  |
-
-**Returns:** *`Promise<void>`*
-
-___
-
-###  checkProofsArray
-
-▸ **checkProofsArray**(`proofs`: `Proof`[], `round`: number): *`Promise<void>`*
-
-Check a whole proofs array sent by the operator
-
-**Parameters:**
-
-Name | Type | Description |
------- | ------ | ------ |
-`proofs` | `Proof`[] | Array of proofs to check |
-`round` | number | Round number to check against  |
 
 **Returns:** *`Promise<void>`*
 
@@ -333,91 +231,6 @@ Name | Type | Description |
 
 ___
 
-###  ensureQuarter
-
-▸ **ensureQuarter**(): *`Promise<void>`*
-
-Internal use only
-
-**Returns:** *`Promise<void>`*
-
-___
-
-###  ensureRound
-
-▸ **ensureRound**(): *`Promise<void>`*
-
-Internal use only
-
-**Returns:** *`Promise<void>`*
-
-___
-
-###  fetchFills
-
-▸ **fetchFills**(`round`: number): *`Promise<void>`*
-
-Retrieves all fills for a given round
-
-**Parameters:**
-
-Name | Type | Description |
------- | ------ | ------ |
-`round` | number | Round number  |
-
-**Returns:** *`Promise<void>`*
-
-___
-
-###  fetchProofs
-
-▸ **fetchProofs**(`round`: number): *`Promise<Proof[]>`*
-
-Returns all proofs for the given round
-
-**Parameters:**
-
-Name | Type | Description |
------- | ------ | ------ |
-`round` | number | Round number  |
-
-**Returns:** *`Promise<Proof[]>`*
-
-___
-
-###  getBalanceTokenOffChain
-
-▸ **getBalanceTokenOffChain**(`assetAddress`: string, `round`: number): *`Promise<BigNumber>`*
-
-Returns the balance for a specific asset/round
-
-**Parameters:**
-
-Name | Type | Description |
------- | ------ | ------ |
-`assetAddress` | string | Address of the address |
-`round` | number | Round for computing the balance  |
-
-**Returns:** *`Promise<BigNumber>`*
-
-___
-
-###  getBalanceTokenOnChain
-
-▸ **getBalanceTokenOnChain**(`assetAddress`: string): *`Promise<BigNumber>`*
-
-Returns the balance of tokens on-chain
-
-**Parameters:**
-
-Name | Type | Description |
------- | ------ | ------ |
-`assetAddress` | string | Address of the asset to return the balance for  |
-
-**Returns:** *`Promise<BigNumber>`*
-
-___
-
 ###  getInstanceId
 
 ▸ **getInstanceId**(): *string*
@@ -426,110 +239,6 @@ Returns the instanceId (mediator contract address) that
 the client is connected to
 
 **Returns:** *string*
-
-___
-
-###  getProofAsync
-
-▸ **getProofAsync**(`asset`: string, `round`: number): *`Promise<Proof | undefined>`*
-
-Fetches a proof for the given asset and round number
-
-**Parameters:**
-
-Name | Type | Description |
------- | ------ | ------ |
-`asset` | string | Address of the asset to get the proof for |
-`round` | number | Round number  |
-
-**Returns:** *`Promise<Proof | undefined>`*
-
-___
-
-###  getRegisteredAssets
-
-▸ **getRegisteredAssets**(): *`Promise<string[]>`*
-
-Returns the ordered list of registered assets of the mediator
-
-**Returns:** *`Promise<string[]>`*
-
-___
-
-###  getRoundFromBlockNumber
-
-▸ **getRoundFromBlockNumber**(`blockNumber`: number): *`Promise<number>`*
-
-Computes locally the round number from a block number
-
-**Parameters:**
-
-Name | Type | Description |
------- | ------ | ------ |
-`blockNumber` | number | number of the block from which we want to deduce the round  |
-
-**Returns:** *`Promise<number>`*
-
-___
-
-###  getSortedProofsArray
-
-▸ **getSortedProofsArray**(`round`: number): *`Promise<Proof[]>`*
-
-Returns the list of proofs sorted by registered assets
-
-**Parameters:**
-
-Name | Type | Description |
------- | ------ | ------ |
-`round` | number | Round of the proofs to be retrieved  |
-
-**Returns:** *`Promise<Proof[]>`*
-
-___
-
-###  goToQuarter
-
-▸ **goToQuarter**(`round`: number, `quarter`: `Quarter`): *`Promise<void>`*
-
-Internal use only
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`round` | number |
-`quarter` | `Quarter` |
-
-**Returns:** *`Promise<void>`*
-
-___
-
-###  goToRound
-
-▸ **goToRound**(`round`: number): *void*
-
-Internal use only
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`round` | number |
-
-**Returns:** *void*
-
-___
-
-###  hasAuthorization
-
-▸ **hasAuthorization**(): *boolean*
-
-Checks if the client has been authorized to join the exchange
-Assumes the join() function took care of verifying the authorization
-token
-
-**Returns:** *boolean*
 
 ___
 
@@ -560,45 +269,11 @@ Initialize the client
 
 ___
 
-###  insertFill
-
-▸ **insertFill**(`fill`: `ISignedFill`): *`Promise<void>`*
-
-Internal use only
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`fill` | `ISignedFill` |
-
-**Returns:** *`Promise<void>`*
-
-___
-
 ###  isHalted
 
 ▸ **isHalted**(): *`Promise<boolean>`*
 
 Checks if the mediator is in HALTED mode
-
-**Returns:** *`Promise<boolean>`*
-
-___
-
-###  isProofBalanceOk
-
-▸ **isProofBalanceOk**(`asset`: string, `round`: number, `proofBalance`: `BigNumber`): *`Promise<boolean>`*
-
-Checks that the ledger balance matches the proof balance
-
-**Parameters:**
-
-Name | Type | Description |
------- | ------ | ------ |
-`asset` | string | Address of the asset to check |
-`round` | number | Round number |
-`proofBalance` | `BigNumber` | Balance amount of the proof  |
 
 **Returns:** *`Promise<boolean>`*
 
@@ -623,167 +298,6 @@ ___
 Gracefull cleanup
 
 **Returns:** *`Promise<void>`*
-
-___
-
-###  makeSignedApproval
-
-▸ **makeSignedApproval**(`approvParams`: `IApproval`): *`Promise<ISignedApproval>`*
-
-Signs an approval object using the client key
-
-**Parameters:**
-
-Name | Type | Description |
------- | ------ | ------ |
-`approvParams` | `IApproval` | Approval object to sign  |
-
-**Returns:** *`Promise<ISignedApproval>`*
-
-___
-
-###  on
-
-▸ **on**(`eventName`: string, `callback`: `ListenerFn`): *void*
-
-Used to watch for specific events
-
-**Parameters:**
-
-Name | Type | Description |
------- | ------ | ------ |
-`eventName` | string | Name of the event to watch for |
-`callback` | `ListenerFn` | Callback function to be invoked when the event happens  |
-
-**Returns:** *void*
-
-___
-
-###  onNewBlockAsync
-
-▸ **onNewBlockAsync**(): *`Promise<void>`*
-
-Internal use only
-
-**Returns:** *`Promise<void>`*
-
-___
-
-###  onReceiveFillAsync
-
-▸ **onReceiveFillAsync**(`fill`: `ISignedFill`): *`Promise<void>`*
-
-Internal use only
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`fill` | `ISignedFill` |
-
-**Returns:** *`Promise<void>`*
-
-___
-
-###  once
-
-▸ **once**(`eventName`: string, `callback`: `ListenerFn`): *void*
-
-Used to watch for specific events
-
-**Parameters:**
-
-Name | Type | Description |
------- | ------ | ------ |
-`eventName` | string | Name of the event to watch for |
-`callback` | `ListenerFn` | Callback function to be invoked when the event happens  |
-
-**Returns:** *void*
-
-___
-
-###  openBalanceDispute
-
-▸ **openBalanceDispute**(`round`: number): *`Promise<void>`*
-
-Opens a new balance dispute
-
-The operator will have to answer this challenge within a certain
-time otherwise the mediator will go into HALTED mode.
-
-**Parameters:**
-
-Name | Type | Description |
------- | ------ | ------ |
-`round` | number | Round number  |
-
-**Returns:** *`Promise<void>`*
-
-___
-
-###  recoverFunds
-
-▸ **recoverFunds**(`asset`: string): *`Promise<void>`*
-
-Allows the use to recover funds once the mediator has
-entered HALTED state.
-
-**Parameters:**
-
-Name | Type | Description |
------- | ------ | ------ |
-`asset` | string | Address of the asset to recover funds for  |
-
-**Returns:** *`Promise<void>`*
-
-___
-
-###  signApprovBytes
-
-▸ **signApprovBytes**(`approvParams`: `IApproval`): *`Promise<SignatureSol>`*
-
-Internal use only
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`approvParams` | `IApproval` |
-
-**Returns:** *`Promise<SignatureSol>`*
-
-___
-
-###  storeProofsAsync
-
-▸ **storeProofsAsync**(`proofs`: `Proof`[], `round`: number): *`Promise<void>`*
-
-Stores a set of proofs for a given round
-
-**Parameters:**
-
-Name | Type | Description |
------- | ------ | ------ |
-`proofs` | `Proof`[] | Array of proofs |
-`round` | number | Round number  |
-
-**Returns:** *`Promise<void>`*
-
-___
-
-###  waitForEvent
-
-▸ **waitForEvent**(`eventName`: string): *`Promise<any>`*
-
-Used to watch for specific events
-
-**Parameters:**
-
-Name | Type | Description |
------- | ------ | ------ |
-`eventName` | string | Name of the event to watch for  |
-
-**Returns:** *`Promise<any>`*
 
 ___
 

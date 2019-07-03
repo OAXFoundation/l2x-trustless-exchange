@@ -18,11 +18,12 @@ import { WETH_CONTRACT_NAME } from '../libs/SystemFixture'
 import { OAX_CONTRACT_NAME } from '../libs/SystemFixture'
 import { MediatorAsync } from '../../src/common/mediator/Contracts'
 
-import { ExchangeClient, L2Client } from '@oax/client'
+import { ExchangeClient } from '@oax/client'
 
 import { MetaLedger } from '../../src/common/accounting/MetaLedger'
 import { Operator } from '@oax/server/operator/Operator'
 import { mkRandomHash } from '../libs/CryptoUtils'
+import { L2ClientForTest } from '../libs/L2ClientForTest'
 
 function doServerSetupInTest() {
   return process.env.DOCKER_E2E == undefined
@@ -30,7 +31,7 @@ function doServerSetupInTest() {
 
 async function skipToNextRound(
   mediator: MediatorAsync,
-  clients: L2Client[],
+  clients: L2ClientForTest[],
   signer: Signer
 ) {
   const round = await mediator.getCurrentRound()
@@ -43,7 +44,7 @@ async function skipToNextRound(
 
 async function skipToNextQuarter(
   mediator: MediatorAsync,
-  clients: L2Client[],
+  clients: L2ClientForTest[],
   signer: Signer
 ): Promise<void> {
   const quarter = await mediator.getCurrentQuarter()
@@ -74,7 +75,7 @@ describe('End-to-end Dispute Scenarios', () => {
 
   let fixtures: SystemFixtures.SystemFixture
 
-  let aliceL2: L2Client
+  let aliceL2: L2ClientForTest
 
   let aliceEx: ExchangeClient
 
