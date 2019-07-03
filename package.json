@@ -12,7 +12,7 @@
     "clean": "clean_build.sh",
     "clean-build": "pnpm run clean; pnpm run build",
     "cov": "pnpm run clean-build && jest --coverage --runInBand build/dist",
-    "docs": "typedoc --options typedoc.json src",
+    "docs": "docs_build.sh",
     "format": "prettier --write '**/*.ts' 'src/client/**/*.js'",
     "lint": "tslint -p tsconfig.json",
     "start": "pnpm run clean-build && start.sh",

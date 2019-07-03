@@ -1,6 +1,6 @@
-> ## [@oax/client](../README.md)
+> ## [OAX](../README.md)
 
-[Globals](../globals.md) / [ExchangeClient](exchangeclient.md) /
+[ExchangeClient]() /
 
 # Class: ExchangeClient
 
@@ -12,39 +12,39 @@
 
 #### Constructors
 
-* [constructor](exchangeclient.md#constructor)
+* [constructor](#constructor)
 
 #### Properties
 
-* [assetRegistry](exchangeclient.md#assetregistry)
-* [config](exchangeclient.md#config)
+* [assetRegistry](#assetregistry)
+* [config](#config)
 
 #### Accessors
 
-* [isConnected](exchangeclient.md#isconnected)
+* [isConnected](#isconnected)
 
 #### Methods
 
-* [cancelOrder](exchangeclient.md#cancelorder)
-* [confirmWithdrawal](exchangeclient.md#confirmwithdrawal)
-* [createOrder](exchangeclient.md#createorder)
-* [deposit](exchangeclient.md#deposit)
-* [fetchBalances](exchangeclient.md#fetchbalances)
-* [fetchOrder](exchangeclient.md#fetchorder)
-* [fetchOrderBook](exchangeclient.md#fetchorderbook)
-* [fetchOrders](exchangeclient.md#fetchorders)
-* [fetchTrades](exchangeclient.md#fetchtrades)
-* [join](exchangeclient.md#join)
-* [leave](exchangeclient.md#leave)
-* [requestWithdrawal](exchangeclient.md#requestwithdrawal)
-* [requestWithdrawalConvert](exchangeclient.md#requestwithdrawalconvert)
-* [requestWithdrawalWithWeiConversion](exchangeclient.md#requestwithdrawalwithweiconversion)
+* [cancelOrder](#cancelorder)
+* [confirmWithdrawal](#confirmwithdrawal)
+* [createOrder](#createorder)
+* [deposit](#deposit)
+* [fetchBalances](#fetchbalances)
+* [fetchOrder](#fetchorder)
+* [fetchOrderBook](#fetchorderbook)
+* [fetchOrders](#fetchorders)
+* [fetchTrades](#fetchtrades)
+* [join](#join)
+* [leave](#leave)
+* [requestWithdrawal](#requestwithdrawal)
+* [requestWithdrawalConvert](#requestwithdrawalconvert)
+* [requestWithdrawalWithWeiConversion](#requestwithdrawalwithweiconversion)
 
 ## Constructors
 
 ###  constructor
 
-\+ **new ExchangeClient**(`identity`: `Identity`, `hubClient`: `L2Client`, `assetRegistry`: `AssetRegistry`, `config`: `ClientConfig`): *[ExchangeClient](exchangeclient.md)*
+\+ **new ExchangeClient**(`identity`: `Identity`, `hubClient`: [L2Client](Client_L2Client.md), `assetRegistry`: `AssetRegistry`, `config`: `ClientConfig`): *[ExchangeClient]()*
 
 Constructor
 
@@ -53,11 +53,11 @@ Constructor
 Name | Type | Description |
 ------ | ------ | ------ |
 `identity` | `Identity` | Identity used by the operator for signing |
-`hubClient` | `L2Client` | L2Client to communicate with the operator layer |
+`hubClient` | [L2Client](Client_L2Client.md) | L2Client to communicate with the operator layer |
 `assetRegistry` | `AssetRegistry` | AssetRegistry, mapping asset symbols to Ethereum addresses |
 `config` | `ClientConfig` | Configuration object including mediator address, fees, etc  |
 
-**Returns:** *[ExchangeClient](exchangeclient.md)*
+**Returns:** *[ExchangeClient]()*
 
 ___
 
@@ -162,8 +162,8 @@ Deposit asset
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`asset` | string | Address of the token for the withdrawal |
-`amount` | `BigNumber` | Quantity of tokens to be withdrawn (in wei) |
+`asset` | string | Address of the token for the deposit |
+`amount` | `BigNumber` | Quantity of tokens to be deposited |
 `approve` | boolean | Whether to call ERC20.approve before doing the deposit  |
 
 **Returns:** *`Promise<void>`*

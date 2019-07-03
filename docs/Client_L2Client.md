@@ -1,6 +1,6 @@
-> ## [@oax/client](../README.md)
+> ## [OAX](../README.md)
 
-[Globals](../globals.md) / [L2Client](l2client.md) /
+[L2Client]() /
 
 # Class: L2Client
 
@@ -12,73 +12,75 @@
 
 #### Constructors
 
-* [constructor](l2client.md#constructor)
+* [constructor](#constructor)
 
 #### Properties
 
-* [address](l2client.md#address)
-* [assets](l2client.md#assets)
-* [identity](l2client.md#identity)
-* [ledger](l2client.md#ledger)
-* [persistence](l2client.md#persistence)
-* [transport](l2client.md#transport)
+* [address](#address)
+* [assets](#assets)
+* [identity](#identity)
+* [ledger](#ledger)
+* [mediator](#mediator)
+* [persistence](#persistence)
+* [transport](#transport)
 
 #### Accessors
 
-* [authorization](l2client.md#authorization)
-* [isConnected](l2client.md#isconnected)
-* [quarter](l2client.md#quarter)
-* [round](l2client.md#round)
-* [roundJoined](l2client.md#roundjoined)
-* [roundSize](l2client.md#roundsize)
+* [authorization](#authorization)
+* [isConnected](#isconnected)
+* [quarter](#quarter)
+* [round](#round)
+* [roundJoined](#roundjoined)
+* [roundSize](#roundsize)
 
 #### Methods
 
-* [audit](l2client.md#audit)
-* [auditAsset](l2client.md#auditasset)
-* [cancelOrder](l2client.md#cancelorder)
-* [checkProof](l2client.md#checkproof)
-* [checkProofsArray](l2client.md#checkproofsarray)
-* [confirmWithdrawal](l2client.md#confirmwithdrawal)
-* [createOrder](l2client.md#createorder)
-* [deposit](l2client.md#deposit)
-* [ensureQuarter](l2client.md#ensurequarter)
-* [ensureRound](l2client.md#ensureround)
-* [fetchFills](l2client.md#fetchfills)
-* [fetchProofs](l2client.md#fetchproofs)
-* [getBalanceTokenOffChain](l2client.md#getbalancetokenoffchain)
-* [getBalanceTokenOnChain](l2client.md#getbalancetokenonchain)
-* [getInstanceId](l2client.md#getinstanceid)
-* [getProofAsync](l2client.md#getproofasync)
-* [getRegisteredAssets](l2client.md#getregisteredassets)
-* [getSortedProofsArray](l2client.md#getsortedproofsarray)
-* [goToQuarter](l2client.md#gotoquarter)
-* [goToRound](l2client.md#gotoround)
-* [hasAuthorization](l2client.md#hasauthorization)
-* [hasFill](l2client.md#hasfill)
-* [init](l2client.md#init)
-* [insertFill](l2client.md#insertfill)
-* [isHalted](l2client.md#ishalted)
-* [isProofBalanceOk](l2client.md#isproofbalanceok)
-* [join](l2client.md#join)
-* [leave](l2client.md#leave)
-* [makeSignedApproval](l2client.md#makesignedapproval)
-* [on](l2client.md#on)
-* [onNewBlockAsync](l2client.md#onnewblockasync)
-* [onReceiveFillAsync](l2client.md#onreceivefillasync)
-* [once](l2client.md#once)
-* [openBalanceDispute](l2client.md#openbalancedispute)
-* [recoverFunds](l2client.md#recoverfunds)
-* [signApprovBytes](l2client.md#signapprovbytes)
-* [storeProofsAsync](l2client.md#storeproofsasync)
-* [waitForEvent](l2client.md#waitforevent)
-* [withdraw](l2client.md#withdraw)
+* [audit](#audit)
+* [auditAsset](#auditasset)
+* [cancelOrder](#cancelorder)
+* [checkProof](#checkproof)
+* [checkProofsArray](#checkproofsarray)
+* [confirmWithdrawal](#confirmwithdrawal)
+* [createOrder](#createorder)
+* [deposit](#deposit)
+* [ensureQuarter](#ensurequarter)
+* [ensureRound](#ensureround)
+* [fetchFills](#fetchfills)
+* [fetchProofs](#fetchproofs)
+* [getBalanceTokenOffChain](#getbalancetokenoffchain)
+* [getBalanceTokenOnChain](#getbalancetokenonchain)
+* [getInstanceId](#getinstanceid)
+* [getProofAsync](#getproofasync)
+* [getRegisteredAssets](#getregisteredassets)
+* [getRoundFromBlockNumber](#getroundfromblocknumber)
+* [getSortedProofsArray](#getsortedproofsarray)
+* [goToQuarter](#gotoquarter)
+* [goToRound](#gotoround)
+* [hasAuthorization](#hasauthorization)
+* [hasFill](#hasfill)
+* [init](#init)
+* [insertFill](#insertfill)
+* [isHalted](#ishalted)
+* [isProofBalanceOk](#isproofbalanceok)
+* [join](#join)
+* [leave](#leave)
+* [makeSignedApproval](#makesignedapproval)
+* [on](#on)
+* [onNewBlockAsync](#onnewblockasync)
+* [onReceiveFillAsync](#onreceivefillasync)
+* [once](#once)
+* [openBalanceDispute](#openbalancedispute)
+* [recoverFunds](#recoverfunds)
+* [signApprovBytes](#signapprovbytes)
+* [storeProofsAsync](#storeproofsasync)
+* [waitForEvent](#waitforevent)
+* [withdraw](#withdraw)
 
 ## Constructors
 
 ###  constructor
 
-\+ **new L2Client**(`identity`: `Identity`, `transport`: `HTTPClient` | string, `options`: `L2ClientOptions`): *[L2Client](l2client.md)*
+\+ **new L2Client**(`identity`: `Identity`, `transport`: [HTTPClient](httpclient.md) | string, `options`: `L2ClientOptions`): *[L2Client]()*
 
 Constructor
 
@@ -87,10 +89,10 @@ Constructor
 Name | Type | Description |
 ------ | ------ | ------ |
 `identity` | `Identity` | A JsonRPCIdentity or PrivateKeyIdentity object for the user's wallet. |
-`transport` | `HTTPClient` \| string | Used for communicating with the server. |
+`transport` | [HTTPClient](httpclient.md) \| string | Used for communicating with the server. |
 `options` | `L2ClientOptions` | Various configuration options including the operatorAddress, etc.  |
 
-**Returns:** *[L2Client](l2client.md)*
+**Returns:** *[L2Client]()*
 
 ___
 
@@ -120,6 +122,12 @@ ___
 
 ___
 
+###  mediator
+
+● **mediator**: *`IMediatorAsync`*
+
+___
+
 ###  persistence
 
 ● **persistence**: *`knex`*
@@ -128,7 +136,7 @@ ___
 
 ###  transport
 
-● **transport**: *`HTTPClient`*
+● **transport**: *[HTTPClient](httpclient.md)*
 
 ___
 
@@ -445,6 +453,22 @@ ___
 Returns the ordered list of registered assets of the mediator
 
 **Returns:** *`Promise<string[]>`*
+
+___
+
+###  getRoundFromBlockNumber
+
+▸ **getRoundFromBlockNumber**(`blockNumber`: number): *`Promise<number>`*
+
+Computes locally the round number from a block number
+
+**Parameters:**
+
+Name | Type | Description |
+------ | ------ | ------ |
+`blockNumber` | number | number of the block from which we want to deduce the round  |
+
+**Returns:** *`Promise<number>`*
 
 ___
 
