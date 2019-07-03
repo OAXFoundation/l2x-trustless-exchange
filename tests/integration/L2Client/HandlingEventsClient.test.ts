@@ -7,8 +7,6 @@
 /* eslint-env jest */
 import 'jest'
 
-import { L2Client } from '../../../src/client/operator/L2Client'
-
 import { etherToD } from '../../../src/common/BigNumberUtils'
 
 import { JsonRpcProvider } from 'ethers/providers'
@@ -19,13 +17,14 @@ import * as SystemFixtures from '../../libs/SystemFixture'
 import { MediatorMock } from '../../../src/contracts/wrappers/MediatorMock'
 import { OAX_CONTRACT_NAME, WETH_CONTRACT_NAME } from '../../libs/SystemFixture'
 import { Mediator } from '../../../src/contracts/wrappers/Mediator'
+import { L2ClientForTest } from 'tests/libs/L2ClientForTest'
 
 describe('How the client handles events', () => {
   const provider = new JsonRpcProvider(GETH_RPC_URL)
 
   let fixtures: SystemFixtures.SystemFixture
   let clientIdentity: Identity
-  let client: L2Client
+  let client: L2ClientForTest
   let mediator: Mediator | MediatorMock
 
   describe('When a new quarter starts', () => {

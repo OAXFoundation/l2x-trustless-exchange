@@ -12,11 +12,7 @@ import EventEmitter from 'eventemitter3'
 
 import { D } from '@oax/common/BigNumberUtils'
 
-import {
-  Quarter,
-  SignatureSol,
-  AuditResult
-} from '@oax/common/types/BasicTypes'
+import { Quarter, AuditResult } from '@oax/common/types/BasicTypes'
 
 import { IApproval, ISignedApproval } from '@oax/common/types/Approvals'
 
@@ -65,7 +61,7 @@ const logger = loggers.get('frontend')
 const FETCH_FILL_QUARTER = 0
 const AUDIT_QUARTER = 1
 
-interface L2ClientOptions {
+export interface L2ClientOptions {
   operatorAddress: string
   mediator: IMediatorAsync | string
   persistence?: knex
@@ -181,7 +177,7 @@ export class L2Client {
   /**
    * Returns the authorization message signed by the operator when joining
    **/
-  get authorization(): IAuthorizationMessage {
+  protected get authorization(): IAuthorizationMessage {
     if (this._authorization === undefined) {
       throw Error('Authorization message unavailable.')
     }
@@ -194,7 +190,7 @@ export class L2Client {
    * Assumes the join() function took care of verifying the authorization
    * token
    */
-  hasAuthorization(): boolean {
+  protected hasAuthorization(): boolean {
     return this._authorization !== undefined
   }
 
@@ -260,7 +256,7 @@ export class L2Client {
    * Computes locally the round number from a block number
    * @param blockNumber number of the block from which we want to deduce the round
    */
-  async getRoundFromBlockNumber(blockNumber: number) {
+  protected async getRoundFromBlockNumber(blockNumber: number) {
     if (this._blockNumberAtCreation === undefined) {
       this._blockNumberAtCreation = await this.mediator.getBlockNumberAtCreation()
     }
@@ -332,6 +328,13 @@ export class L2Client {
   }
 
   /**
+   * Checks if the mediator is in HALTED mode
+   **/
+  async isHalted(): Promise<boolean> {
+    return this.mediator.isHalted()
+  }
+
+  /**
    * Checks if a given round has a fill
    *
    * @param round Round number
@@ -347,18 +350,11 @@ export class L2Client {
   }
 
   /**
-   * Checks if the mediator is in HALTED mode
-   **/
-  async isHalted(): Promise<boolean> {
-    return this.mediator.isHalted()
-  }
-
-  /**
    * Retrieves all fills for a given round
    *
    * @param round Round number
    **/
-  async fetchFills(round: number): Promise<void> {
+  protected async fetchFills(round: number): Promise<void> {
     logger.info('Fetching fills from server...')
 
     const signedFills = await this.transport.fetchFills(this.address, round)
@@ -438,7 +434,7 @@ export class L2Client {
   /**
    * Checks that the operator / mediator state is accurate else open a dispute
    **/
-  async audit(): Promise<void> {
+  protected async audit(): Promise<void> {
     const round = this.round
 
     if (round === 0) {
@@ -475,7 +471,7 @@ export class L2Client {
    * Returns the list of proofs sorted by registered assets
    * @param round Round of the proofs to be retrieved
    */
-  async getSortedProofsArray(round: number): Promise<Proof[]> {
+  private async getSortedProofsArray(round: number): Promise<Proof[]> {
     const proofsArray = []
 
     const listOfRegisteredTokenAddresses = await this.getRegisteredAssets()
@@ -496,7 +492,7 @@ export class L2Client {
   /**
    * Returns the ordered list of registered assets of the mediator
    */
-  async getRegisteredAssets(): Promise<string[]> {
+  protected async getRegisteredAssets(): Promise<string[]> {
     const listOfRegisteredTokenAddresses = await this.mediator.getSortedListOfregisteredTokensAddresses()
     return listOfRegisteredTokenAddresses
   }
@@ -506,7 +502,7 @@ export class L2Client {
    *
    * @param round Round number
    */
-  async fetchProofs(round: number) {
+  protected async fetchProofs(round: number) {
     return await this.transport.audit(this.address, round)
   }
 
@@ -515,7 +511,10 @@ export class L2Client {
    * @param proofs Array of proofs to check
    * @param round Round number to check against
    */
-  async checkProofsArray(proofs: Proof[], round: number): Promise<void> {
+  private async checkProofsArray(
+    proofs: Proof[],
+    round: number
+  ): Promise<void> {
     if (proofs.length != this.assets.length) {
       throw Error(
         `Number of proofs does not match number of assets: ${
@@ -531,25 +530,15 @@ export class L2Client {
   }
 
   /**
-   * Fetches a proof for the given asset and round number
-   *
-   * @param asset Address of the asset to get the proof for
-   * @param round Round number
-   **/
-  async getProofAsync(
-    asset: string,
-    round: number
-  ): Promise<Proof | undefined> {
-    return ProofCollection.with(this.persistence).findOne({ asset, round })
-  }
-
-  /**
    * Stores a set of proofs for a given round
    *
    * @param proofs Array of proofs
    * @param round Round number
    **/
-  async storeProofsAsync(proofs: Proof[], round: number): Promise<void> {
+  protected async storeProofsAsync(
+    proofs: Proof[],
+    round: number
+  ): Promise<void> {
     for (const proof of proofs) {
       try {
         logger.info(
@@ -570,7 +559,7 @@ export class L2Client {
    *
    * @param round Round number
    **/
-  async openBalanceDispute(round: number) {
+  protected async openBalanceDispute(round: number) {
     if (await this.isHalted()) {
       throw Error('Unable to open dispute: the mediator is halted.')
     }
@@ -616,7 +605,11 @@ authorization: ${JSON.stringify(this.authorization)}`)
    * @param proof Proof for the asset at the given round
    * @param round Round number
    **/
-  async auditAsset(asset: string, proof: Proof, round: number): Promise<void> {
+  private async auditAsset(
+    asset: string,
+    proof: Proof,
+    round: number
+  ): Promise<void> {
     const failMsg = (reason: string) =>
       `Audit failed for asset ${asset}, round ${round}: ${reason}`
 
@@ -670,7 +663,7 @@ authorization: ${JSON.stringify(this.authorization)}`)
    * @param round Round number
    * @param proofBalance Balance amount of the proof
    **/
-  async isProofBalanceOk(
+  protected async isProofBalanceOk(
     asset: string,
     round: number,
     proofBalance: BigNumber
@@ -700,7 +693,7 @@ authorization: ${JSON.stringify(this.authorization)}`)
    * @param proof Proof object to validate
    * @param proofRound Round number
    **/
-  async checkProof(proof: Proof, proofRound: number): Promise<void> {
+  protected async checkProof(proof: Proof, proofRound: number): Promise<void> {
     // round zero never has a root
     if (proofRound == 0) {
       return
@@ -729,27 +722,18 @@ authorization: ${JSON.stringify(this.authorization)}`)
     }
   }
 
-  /**
-   * Internal use only
-   **/
-  goToRound(round: number) {
+  protected goToRound(round: number) {
     this._round = round
   }
 
-  /**
-   * Internal use only
-   **/
-  async ensureRound(): Promise<void> {
+  protected async ensureRound(): Promise<void> {
     const round = await this.mediator.getCurrentRound()
     if (round != this.round) {
       await this.goToRound(round)
     }
   }
 
-  /**
-   * Internal use only
-   **/
-  async ensureQuarter(): Promise<void> {
+  private async ensureQuarter(): Promise<void> {
     const quarter = await this.mediator.getCurrentQuarter()
     if (quarter != this.quarter) {
       await this.goToQuarter(this.round, quarter)
@@ -808,10 +792,7 @@ authorization: ${JSON.stringify(this.authorization)}`)
     this.eventEmitter.emit('WithdrawalConfirmed')
   }
 
-  /**
-   * Internal use only
-   **/
-  async goToQuarter(round: number, quarter: Quarter): Promise<void> {
+  protected async goToQuarter(round: number, quarter: Quarter): Promise<void> {
     this._quarter = quarter
     logger.info(`Going to round=${round} quarter=${quarter}`)
 
@@ -861,7 +842,7 @@ authorization: ${JSON.stringify(this.authorization)}`)
    * @param eventName Name of the event to watch for
    * @param callback Callback function to be invoked when the event happens
    **/
-  on(eventName: string, callback: EventEmitter.ListenerFn): void {
+  protected on(eventName: string, callback: EventEmitter.ListenerFn): void {
     this.eventEmitter.on(eventName, callback)
   }
 
@@ -871,7 +852,7 @@ authorization: ${JSON.stringify(this.authorization)}`)
    * @param eventName Name of the event to watch for
    * @param callback Callback function to be invoked when the event happens
    **/
-  once(eventName: string, callback: EventEmitter.ListenerFn): void {
+  protected once(eventName: string, callback: EventEmitter.ListenerFn): void {
     this.eventEmitter.once(eventName, callback)
   }
 
@@ -880,7 +861,7 @@ authorization: ${JSON.stringify(this.authorization)}`)
    *
    * @param eventName Name of the event to watch for
    **/
-  waitForEvent(eventName: string): Promise<any> {
+  protected waitForEvent(eventName: string): Promise<any> {
     const event = (name: string) =>
       new Promise(resolve => this.once(name, resolve))
 
@@ -893,7 +874,7 @@ authorization: ${JSON.stringify(this.authorization)}`)
    *
    * @param asset Address of the asset to recover funds for
    **/
-  async recoverFunds(asset: string) {
+  protected async recoverFunds(asset: string) {
     const isMediatorHalted = await this.mediator.isHalted()
 
     if (!isMediatorHalted) {
@@ -988,19 +969,13 @@ authorization: ${JSON.stringify(this.authorization)}`)
     this.eventEmitter.emit('recoveryCompleted')
   }
 
-  /**
-   * Internal use only
-   **/
-  public async onNewBlockAsync() {
+  private async onNewBlockAsync() {
     await this.ensureRound()
     await this.ensureQuarter()
     this.eventEmitter.emit('onNewBlockProcessed')
   }
 
-  /**
-   * Internal use only
-   **/
-  async onReceiveFillAsync(fill: ISignedFill): Promise<void> {
+  protected async onReceiveFillAsync(fill: ISignedFill): Promise<void> {
     const digest = FillMediator.fromIFill(fill.params).createDigest()
 
     if (!verifySig(digest, fill.signature, this.operatorAddress)) {
@@ -1080,62 +1055,16 @@ authorization: ${JSON.stringify(this.authorization)}`)
   }
 
   /**
-   * Internal use only
-   **/
-  async insertFill(fill: ISignedFill) {
-    await this.ledger.insertFill(fill)
-  }
-
-  /**
-   * Internal use only
-   **/
-  public async signApprovBytes(approvParams: IApproval): Promise<SignatureSol> {
-    const sig = await this.identity.signApprov(approvParams)
-    const sigAsBytes = [...EthersUtils.arrayify(sig)].map(EthersUtils.hexlify)
-    return sigAsBytes
-  }
-
-  /**
    * Signs an approval object using the client key
    * @param approvParams Approval object to sign
    */
-  public async makeSignedApproval(
+  protected async makeSignedApproval(
     approvParams: IApproval
   ): Promise<ISignedApproval> {
     const signedApproval = makeSignedApproval(approvParams, this
       .identity as PrivateKeyIdentity)
 
     return signedApproval
-  }
-
-  /**
-   * Returns the balance of tokens on-chain
-   * @param assetAddress Address of the asset to return the balance for
-   */
-  public async getBalanceTokenOnChain(
-    assetAddress: string
-  ): Promise<BigNumber> {
-    const tokenContract = getContract(
-      assetAddress,
-      'ERC20',
-      this.identity
-    ) as ERC20
-
-    const balanceString = await tokenContract.functions.balanceOf(this.address)
-
-    return D(balanceString.toString())
-  }
-
-  /**
-   * Returns the balance for a specific asset/round
-   * @param assetAddress Address of the address
-   * @param round Round for computing the balance
-   */
-  public async getBalanceTokenOffChain(
-    assetAddress: string,
-    round: number
-  ): Promise<BigNumber> {
-    return this.ledger.balance(assetAddress, this.address, round)
   }
 
   private async getAuthorization(): Promise<IAuthorizationMessage> {

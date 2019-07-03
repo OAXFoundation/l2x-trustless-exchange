@@ -9,8 +9,6 @@ import 'jest'
 
 import { Address, Amount, Round } from '../../../src/common/types/BasicTypes'
 
-import { L2Client } from '../../../src/client/operator/L2Client'
-
 import { D, etherToD } from '../../../src/common/BigNumberUtils'
 
 import { JsonRpcProvider } from 'ethers/providers'
@@ -39,6 +37,7 @@ import {
   IApproval
 } from '../../../src/common/types/Approvals'
 import { AuditError } from '../../../src/common/Errors'
+import { L2ClientForTest } from '../../libs/L2ClientForTest'
 
 describe('How the client interacts with other components', () => {
   describe('the main functions of the client.', () => {
@@ -49,8 +48,8 @@ describe('How the client interacts with other components', () => {
 
     let fixtures: SystemFixtures.SystemFixture
     let operatorIdentity: Identity
-    let alice: L2Client
-    let bob: L2Client
+    let alice: L2ClientForTest
+    let bob: L2ClientForTest
     let mediatorOperator: MediatorMock
 
     let operator: OperatorMock

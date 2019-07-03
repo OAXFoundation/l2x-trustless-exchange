@@ -8,7 +8,6 @@
 import 'jest'
 import knex from 'knex'
 import { mock, instance, when, reset } from 'ts-mockito'
-import { L2Client } from '../../../src/client/operator/L2Client'
 import { PrivateKeyIdentity } from '../../../src/common/identity/PrivateKeyIdentity'
 import { HTTPClient } from '../../../src/client/common/HTTPClient'
 import { WalletCollection } from '../../../src/common/persistence/WalletCollection'
@@ -18,12 +17,13 @@ import { Digest } from '../../../src/common/types/BasicTypes'
 import { NULL_AUTHORIZATION_MESSAGE } from '../../libs/EthereumBlockchain'
 import { mkAuthorization } from '../../../src/common/AuthorizationMessage'
 import { IAuthorizationMessage } from '../../../src/common/types/SmartContractTypes'
+import { L2ClientForTest } from '../../libs/L2ClientForTest'
 
 const mockedHTTPClient: HTTPClient = mock(HTTPClient)
 const mockedMediatorAsync: IMediatorAsync = mock(MediatorAsync)
 
 describe('OperatorClient-AccountCollection Integration', () => {
-  let operatorClient: L2Client
+  let operatorClient: L2ClientForTest
   let dbConn: knex
 
   const wallet = new PrivateKeyIdentity(
@@ -45,7 +45,7 @@ describe('OperatorClient-AccountCollection Integration', () => {
       useNullAsDefault: true
     })
 
-    operatorClient = new L2Client(wallet, httpClient, {
+    operatorClient = new L2ClientForTest(wallet, httpClient, {
       operatorAddress: operatorWallet.address,
       mediator,
       persistence: dbConn
