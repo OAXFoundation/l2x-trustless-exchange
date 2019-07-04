@@ -4,6 +4,7 @@ pragma experimental ABIEncoderV2; // solium-disable-line no-experimental
 // ----------------------------------------------------------------------------
 // Copyright (c) 2018,2019 OAX Foundation.
 // https://www.oax.org/
+// See LICENSE file for license details.
 // ----------------------------------------------------------------------------
 
 import "./openzeppelin/SafeMath.sol";
