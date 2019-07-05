@@ -169,7 +169,7 @@ async function main(): Promise<void> {
   logger.info('Creating operator.')
   const operator = new Operator(
     identity!,
-    new MediatorAsync(signer, mediator),
+    new MediatorAsync(signer, mediator, logger),
     provider,
     metaLedger
   )

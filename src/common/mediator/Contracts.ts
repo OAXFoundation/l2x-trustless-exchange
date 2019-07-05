@@ -5,10 +5,12 @@
 // ----------------------------------------------------------------------------
 
 import { safeBigNumberToString, waitForMining } from '../ContractUtils'
-import { Signer, Contract } from 'ethers'
+import { Signer, Contract, providers } from 'ethers'
 import { TransactionReceipt } from 'ethers/providers'
 import { D } from '../BigNumberUtils'
 import { BigNumber } from 'bignumber.js'
+
+import winston from 'winston'
 
 import {
   Address,
@@ -41,10 +43,27 @@ import { Mediator } from '@oax/contracts/wrappers/Mediator'
 export class MediatorAsync implements IMediatorAsync {
   private readonly contractWithSigner: Contract
   readonly contractAddress: Address
+  private readonly logger!: any
 
-  constructor(signer: Signer, contract: MediatorMock | Mediator) {
+  constructor(
+    signer: Signer,
+    contract: MediatorMock | Mediator,
+    logger?: winston.LoggerInstance
+  ) {
     this.contractWithSigner = contract.connect(signer)
     this.contractAddress = this.contractWithSigner.address
+    this.logger = logger
+  }
+
+  private async waitForMiningAndLog(
+    txPromise: Promise<providers.TransactionResponse>
+  ): Promise<providers.TransactionReceipt> {
+    const tx = await waitForMining(txPromise)
+    if (this.logger) {
+      this.logger.info(`Tx hash: ${tx.transactionHash}`)
+    }
+
+    return tx
   }
 
   getContractWrapper() {
@@ -63,13 +82,13 @@ export class MediatorAsync implements IMediatorAsync {
       rootInfo.width
     ).toSol()
 
-    return await waitForMining(
+    return await this.waitForMiningAndLog(
       this.contractWithSigner.functions.commit(rootInfoSol, tokenAddress)
     )
   }
 
   async initiateWithdrawal(proof: Proof, withdrawalAmount: Amount) {
-    return await waitForMining(
+    return await this.waitForMiningAndLog(
       this.contractWithSigner.functions.initiateWithdrawal(
         proof.toSol(),
         withdrawalAmount.toString(10)
@@ -82,7 +101,7 @@ export class MediatorAsync implements IMediatorAsync {
       ? amount.toString(10)
       : amount.toString()
 
-    return await waitForMining(
+    return await this.waitForMiningAndLog(
       this.contractWithSigner.functions.depositTokens(
         tokenAddress,
         formattedAmount
@@ -99,13 +118,13 @@ export class MediatorAsync implements IMediatorAsync {
   }
 
   async registerToken(tokenAddress: Address) {
-    return await waitForMining(
+    return await this.waitForMiningAndLog(
       this.contractWithSigner.functions.registerToken(tokenAddress)
     )
   }
 
   async unregisterToken(tokenAddress: Address) {
-    return await waitForMining(
+    return await this.waitForMiningAndLog(
       this.contractWithSigner.functions.unregisterToken(tokenAddress)
     )
   }
@@ -119,13 +138,13 @@ export class MediatorAsync implements IMediatorAsync {
   }
 
   async skipToNextRound() {
-    return await waitForMining(
+    return await this.waitForMiningAndLog(
       this.contractWithSigner.functions.skipToNextRound()
     )
   }
 
   async skipToNextQuarter() {
-    return await waitForMining(
+    return await this.waitForMiningAndLog(
       this.contractWithSigner.functions.skipToNextQuarter()
     )
   }
@@ -152,7 +171,9 @@ export class MediatorAsync implements IMediatorAsync {
   }
 
   async updateHaltedState(): Promise<boolean> {
-    await waitForMining(this.contractWithSigner.functions.updateHaltedState())
+    await this.waitForMiningAndLog(
+      this.contractWithSigner.functions.updateHaltedState()
+    )
 
     return this.isHalted()
   }
@@ -168,7 +189,7 @@ export class MediatorAsync implements IMediatorAsync {
     tokenAddress: Address,
     clientAddress: Address
   ) {
-    return await waitForMining(
+    return await this.waitForMiningAndLog(
       this.contractWithSigner.functions.cancelWithdrawal(
         approvals.map(a => new Approval(a).toSol()),
         sigs,
@@ -219,7 +240,7 @@ export class MediatorAsync implements IMediatorAsync {
   }
 
   async confirmWithdrawal(tokenAddress: Address) {
-    return await waitForMining(
+    return await this.waitForMiningAndLog(
       this.contractWithSigner.functions.confirmWithdrawal(tokenAddress)
     )
   }
@@ -335,7 +356,7 @@ export class MediatorAsync implements IMediatorAsync {
     sigFills: SignatureSol[],
     authorizationMessage: IAuthorizationMessage
   ) {
-    return await waitForMining(
+    return await this.waitForMiningAndLog(
       this.contractWithSigner.functions.openDispute(
         proofs.map(p => p.toSol()),
         fills.map(f => f.toSol()),
@@ -353,7 +374,7 @@ export class MediatorAsync implements IMediatorAsync {
     sigFills: SignatureSol[],
     clientAddress: Address
   ) {
-    return await waitForMining(
+    return await this.waitForMiningAndLog(
       this.contractWithSigner.functions.closeDispute(
         proofs.map(p => p.toSol()),
         approvals.map(a => a.toSol()),
@@ -379,13 +400,13 @@ export class MediatorAsync implements IMediatorAsync {
   }
 
   async recoverAllFunds(proof: Proof) {
-    return await waitForMining(
+    return await this.waitForMiningAndLog(
       this.contractWithSigner.functions.recoverAllFunds(proof.toSol())
     )
   }
 
   async recoverOnChainFundsOnly(tokenAddress: Address) {
-    return await waitForMining(
+    return await this.waitForMiningAndLog(
       this.contractWithSigner.functions.recoverOnChainFundsOnly(tokenAddress)
     )
   }
@@ -402,7 +423,7 @@ export class MediatorAsync implements IMediatorAsync {
     round: Round,
     n: number
   ): Promise<TransactionReceipt> {
-    return await waitForMining(
+    return await this.waitForMiningAndLog(
       this.contractWithSigner.setOpenDisputeCounter(round, n)
     )
   }
@@ -416,7 +437,7 @@ export class MediatorAsync implements IMediatorAsync {
   }
 
   async setDisputeSummaryCounter(clientAddress: Address, counter: Counter) {
-    return await waitForMining(
+    return await this.waitForMiningAndLog(
       this.contractWithSigner.functions.setDisputeSummaryCounter(
         clientAddress,
         counter
@@ -429,7 +450,7 @@ export class MediatorAsync implements IMediatorAsync {
     openingBalance: Amount,
     pos: number
   ) {
-    return await waitForMining(
+    return await this.waitForMiningAndLog(
       this.contractWithSigner.functions.setPreviousOpeningBalanceClient(
         clientAddress,
         safeBigNumberToString(openingBalance),
@@ -443,7 +464,7 @@ export class MediatorAsync implements IMediatorAsync {
     tokenAddress: Address,
     amount: Amount
   ) {
-    return await waitForMining(
+    return await this.waitForMiningAndLog(
       this.contractWithSigner.functions.setTotalWithdrawalAmount(
         round,
         tokenAddress,
@@ -453,7 +474,9 @@ export class MediatorAsync implements IMediatorAsync {
   }
 
   async halt() {
-    return await waitForMining(this.contractWithSigner.functions.halt())
+    return await this.waitForMiningAndLog(
+      this.contractWithSigner.functions.halt()
+    )
   }
 
   async roundSize(): Promise<BigNumber> {
