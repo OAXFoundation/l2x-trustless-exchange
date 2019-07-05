@@ -446,6 +446,23 @@ describe('what happens when a client opens a balance dispute', () => {
         )
       ).rejects.toThrow()
     })
+
+    it('checks that the authorization message can only be used during roundJoined+1', async () => {
+      const fills: any = []
+      const sigFills: any = []
+      const authorizationMessage = await operator.computeAuthorizationMessage(
+        aliceAddress,
+        currentRound - 2
+      )
+      await expect(
+        contractUsedByAlice.openDispute(
+          [],
+          fills,
+          sigFills,
+          authorizationMessage
+        )
+      ).rejects.toThrow()
+    })
   })
 
   it('checks that there are as many fills as signatures.', async () => {
