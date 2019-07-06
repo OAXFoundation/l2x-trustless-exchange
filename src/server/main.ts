@@ -15,7 +15,8 @@ import {
   WALLET_ADDRESS,
   CONTRACTS,
   STORAGE_DIR,
-  FEE_AMOUNT_WEI
+  FEE_AMOUNT_WEI,
+  GAS_LIMIT
 } from '../../config/environment'
 import { loggers } from '../common/Logging'
 import fs from 'fs'
@@ -167,12 +168,14 @@ async function main(): Promise<void> {
 
   // Setting up operator
   logger.info('Creating operator.')
-  const operator = new Operator(
-    identity!,
-    new MediatorAsync(signer, mediator, logger),
-    provider,
-    metaLedger
+  const mediatorAsync: MediatorAsync = new MediatorAsync(
+    signer,
+    mediator,
+    logger
   )
+  mediatorAsync.setGasLimit(GAS_LIMIT)
+
+  const operator = new Operator(identity!, mediatorAsync, provider, metaLedger)
 
   // Setting up exchange
   const exchangeConfig: ExchangeConfig = {
