@@ -44,6 +44,7 @@ export class MediatorAsync implements IMediatorAsync {
   private readonly contractWithSigner: Contract
   readonly contractAddress: Address
   private readonly logger!: any
+  private gasLimit: number
 
   constructor(
     signer: Signer,
@@ -53,6 +54,7 @@ export class MediatorAsync implements IMediatorAsync {
     this.contractWithSigner = contract.connect(signer)
     this.contractAddress = this.contractWithSigner.address
     this.logger = logger
+    this.gasLimit = 0
   }
 
   private async waitForMiningAndLog(
@@ -64,6 +66,15 @@ export class MediatorAsync implements IMediatorAsync {
     }
 
     return tx
+  }
+
+  public setGasLimit(gasLimit: number) {
+    this.gasLimit = gasLimit
+  }
+
+  private getGasLimitParams() {
+    if (this.gasLimit == 0) return {}
+    else return { gasLimit: this.gasLimit }
   }
 
   getContractWrapper() {
@@ -83,7 +94,11 @@ export class MediatorAsync implements IMediatorAsync {
     ).toSol()
 
     return await this.waitForMiningAndLog(
-      this.contractWithSigner.functions.commit(rootInfoSol, tokenAddress)
+      this.contractWithSigner.functions.commit(
+        rootInfoSol,
+        tokenAddress,
+        this.getGasLimitParams()
+      )
     )
   }
 
@@ -91,7 +106,8 @@ export class MediatorAsync implements IMediatorAsync {
     return await this.waitForMiningAndLog(
       this.contractWithSigner.functions.initiateWithdrawal(
         proof.toSol(),
-        withdrawalAmount.toString(10)
+        withdrawalAmount.toString(10),
+        this.getGasLimitParams()
       )
     )
   }
@@ -104,7 +120,8 @@ export class MediatorAsync implements IMediatorAsync {
     return await this.waitForMiningAndLog(
       this.contractWithSigner.functions.depositTokens(
         tokenAddress,
-        formattedAmount
+        formattedAmount,
+        this.getGasLimitParams()
       )
     )
   }
@@ -119,13 +136,19 @@ export class MediatorAsync implements IMediatorAsync {
 
   async registerToken(tokenAddress: Address) {
     return await this.waitForMiningAndLog(
-      this.contractWithSigner.functions.registerToken(tokenAddress)
+      this.contractWithSigner.functions.registerToken(
+        tokenAddress,
+        this.getGasLimitParams()
+      )
     )
   }
 
   async unregisterToken(tokenAddress: Address) {
     return await this.waitForMiningAndLog(
-      this.contractWithSigner.functions.unregisterToken(tokenAddress)
+      this.contractWithSigner.functions.unregisterToken(
+        tokenAddress,
+        this.getGasLimitParams()
+      )
     )
   }
 
@@ -139,13 +162,17 @@ export class MediatorAsync implements IMediatorAsync {
 
   async skipToNextRound() {
     return await this.waitForMiningAndLog(
-      this.contractWithSigner.functions.skipToNextRound()
+      this.contractWithSigner.functions.skipToNextRound(
+        this.getGasLimitParams()
+      )
     )
   }
 
   async skipToNextQuarter() {
     return await this.waitForMiningAndLog(
-      this.contractWithSigner.functions.skipToNextQuarter()
+      this.contractWithSigner.functions.skipToNextQuarter(
+        this.getGasLimitParams()
+      )
     )
   }
 
@@ -172,7 +199,9 @@ export class MediatorAsync implements IMediatorAsync {
 
   async updateHaltedState(): Promise<boolean> {
     await this.waitForMiningAndLog(
-      this.contractWithSigner.functions.updateHaltedState()
+      this.contractWithSigner.functions.updateHaltedState(
+        this.getGasLimitParams()
+      )
     )
 
     return this.isHalted()
@@ -194,7 +223,8 @@ export class MediatorAsync implements IMediatorAsync {
         approvals.map(a => new Approval(a).toSol()),
         sigs,
         tokenAddress,
-        clientAddress
+        clientAddress,
+        this.getGasLimitParams()
       )
     )
   }
@@ -241,7 +271,10 @@ export class MediatorAsync implements IMediatorAsync {
 
   async confirmWithdrawal(tokenAddress: Address) {
     return await this.waitForMiningAndLog(
-      this.contractWithSigner.functions.confirmWithdrawal(tokenAddress)
+      this.contractWithSigner.functions.confirmWithdrawal(
+        tokenAddress,
+        this.getGasLimitParams()
+      )
     )
   }
 
@@ -361,7 +394,8 @@ export class MediatorAsync implements IMediatorAsync {
         proofs.map(p => p.toSol()),
         fills.map(f => f.toSol()),
         sigFills,
-        authorizationMessage
+        authorizationMessage,
+        this.getGasLimitParams()
       )
     )
   }
@@ -381,7 +415,8 @@ export class MediatorAsync implements IMediatorAsync {
         sigApprovals,
         fills.map(f => f.toSol()),
         sigFills,
-        clientAddress
+        clientAddress,
+        this.getGasLimitParams()
       )
     )
   }
@@ -401,13 +436,19 @@ export class MediatorAsync implements IMediatorAsync {
 
   async recoverAllFunds(proof: Proof) {
     return await this.waitForMiningAndLog(
-      this.contractWithSigner.functions.recoverAllFunds(proof.toSol())
+      this.contractWithSigner.functions.recoverAllFunds(
+        proof.toSol(),
+        this.getGasLimitParams()
+      )
     )
   }
 
   async recoverOnChainFundsOnly(tokenAddress: Address) {
     return await this.waitForMiningAndLog(
-      this.contractWithSigner.functions.recoverOnChainFundsOnly(tokenAddress)
+      this.contractWithSigner.functions.recoverOnChainFundsOnly(
+        tokenAddress,
+        this.getGasLimitParams()
+      )
     )
   }
 
@@ -424,7 +465,11 @@ export class MediatorAsync implements IMediatorAsync {
     n: number
   ): Promise<TransactionReceipt> {
     return await this.waitForMiningAndLog(
-      this.contractWithSigner.setOpenDisputeCounter(round, n)
+      this.contractWithSigner.setOpenDisputeCounter(
+        round,
+        n,
+        this.getGasLimitParams()
+      )
     )
   }
 
@@ -440,7 +485,8 @@ export class MediatorAsync implements IMediatorAsync {
     return await this.waitForMiningAndLog(
       this.contractWithSigner.functions.setDisputeSummaryCounter(
         clientAddress,
-        counter
+        counter,
+        this.getGasLimitParams()
       )
     )
   }
@@ -454,7 +500,8 @@ export class MediatorAsync implements IMediatorAsync {
       this.contractWithSigner.functions.setPreviousOpeningBalanceClient(
         clientAddress,
         safeBigNumberToString(openingBalance),
-        pos
+        pos,
+        this.getGasLimitParams()
       )
     )
   }
@@ -468,14 +515,15 @@ export class MediatorAsync implements IMediatorAsync {
       this.contractWithSigner.functions.setTotalWithdrawalAmount(
         round,
         tokenAddress,
-        safeBigNumberToString(amount)
+        safeBigNumberToString(amount),
+        this.getGasLimitParams()
       )
     )
   }
 
   async halt() {
     return await this.waitForMiningAndLog(
-      this.contractWithSigner.functions.halt()
+      this.contractWithSigner.functions.halt(this.getGasLimitParams())
     )
   }
 
