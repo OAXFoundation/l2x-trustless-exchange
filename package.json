@@ -1,7 +1,7 @@
 {
   "name": "@oax/server",
   "description": "OAX Trustless Server",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "author": "OAX Foundation",
   "license": "MIT",
   "main": "index.js",
