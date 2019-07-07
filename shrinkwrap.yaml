@@ -182,7 +182,7 @@ importers:
       ramda: 0.25.0
       shell-quote: 1.6.1
     specifiers:
-      '@oax/common': 0.3.5
+      '@oax/common': 0.3.6
       await-outside: 2.1.2
       bignumber.js: 8.1.1
       bluebird: 3.5.4
