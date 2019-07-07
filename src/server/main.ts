@@ -173,6 +173,7 @@ async function main(): Promise<void> {
     mediator,
     logger
   )
+
   mediatorAsync.setGasLimit(GAS_LIMIT)
 
   const operator = new Operator(identity!, mediatorAsync, provider, metaLedger)

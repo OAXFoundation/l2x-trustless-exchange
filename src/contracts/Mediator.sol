@@ -1029,7 +1029,7 @@ contract Mediator {
             return false;
         }
 
-        if (authorization.round != currentRound-1) {
+        if (authorization.round != currentRound - 1) {
             return false;
         }
 

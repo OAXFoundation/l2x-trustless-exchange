@@ -17,7 +17,6 @@ if (config.error) {
 ensureConfigExist('GETH_RPC_URL')
 ensureConfigExist('STORAGE_DIR')
 ensureConfigExist('FEE_AMOUNT_ETHER')
-ensureConfigExist('GAS_LIMIT')
 
 export const GETH_RPC_URL = process.env.GETH_RPC_URL!
 export const STORAGE_DIR = process.env.STORAGE_DIR!
@@ -32,7 +31,7 @@ export const WALLET_ADDRESS = process.env.WALLET_ADDRESS
 export const WALLET_FILEPATH = process.env.WALLET_FILEPATH
 export const WALLET_PASSWORD = process.env.WALLET_PASSWORD
 
-export const GAS_LIMIT = Number(process.env.GAS_LIMIT!)
+export const GAS_LIMIT = Number(process.env.GAS_LIMIT || '6800000')
 
 function ensureConfigExist(configName: string) {
   if (process.env[configName] === undefined) {

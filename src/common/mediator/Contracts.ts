@@ -43,8 +43,8 @@ import { Mediator } from '@oax/contracts/wrappers/Mediator'
 export class MediatorAsync implements IMediatorAsync {
   private readonly contractWithSigner: Contract
   readonly contractAddress: Address
-  private readonly logger!: any
-  private gasLimit: number
+  private readonly logger?: winston.LoggerInstance
+  private gasLimit: number = 0
 
   constructor(
     signer: Signer,
@@ -54,18 +54,18 @@ export class MediatorAsync implements IMediatorAsync {
     this.contractWithSigner = contract.connect(signer)
     this.contractAddress = this.contractWithSigner.address
     this.logger = logger
-    this.gasLimit = 0
   }
 
   private async waitForMiningAndLog(
     txPromise: Promise<providers.TransactionResponse>
   ): Promise<providers.TransactionReceipt> {
-    const tx = await waitForMining(txPromise)
+    const tx = await txPromise
+
     if (this.logger) {
-      this.logger.info(`Tx hash: ${tx.transactionHash}`)
+      this.logger.info(`Tx hash: ${tx.hash}`)
     }
 
-    return tx
+    return tx.wait()
   }
 
   public setGasLimit(gasLimit: number) {
@@ -73,7 +73,7 @@ export class MediatorAsync implements IMediatorAsync {
   }
 
   private getGasLimitParams() {
-    if (this.gasLimit == 0) return {}
+    if (this.gasLimit === 0) return {}
     else return { gasLimit: this.gasLimit }
   }
 
