@@ -17,12 +17,13 @@ import {
   AssetRegistry,
   ExchangeClient,
   getContract,
-  L2Client,
   PrivateKeyIdentity
 } from '@oax/client'
 
+import { L2ClientForTest } from '../tests/libs/L2ClientForTest'
+
 interface Client {
-  l2Client: L2Client
+  l2Client: L2ClientForTest
   exClient: ExchangeClient
 }
 
@@ -62,7 +63,7 @@ async function main() {
 
   async function createClient(): Promise<Client> {
     const id = new PrivateKeyIdentity(undefined, provider)
-    const l2Client = new L2Client(id, API_URL, {
+    const l2Client = new L2ClientForTest(id, API_URL, {
       operatorAddress: deployConfig.operator,
       mediator: deployConfig.mediator
     })
@@ -163,6 +164,25 @@ async function main() {
 
         console.info(`Order created successfully with order ID ${orderId}`)
 
+        const randomWithdrawAmount = D(
+          Math.floor(Math.random() * 5000000000000000000).toString(10)
+        )
+        console.log(
+          `Client ${
+            l2Client.address
+          } trying to withdraw ${randomWithdrawAmount} wei...`
+        )
+
+        if (eventShouldOccur('WITHDRAW'))
+          try {
+            await exClient.requestWithdrawal(
+              deployConfig.assets.WETH,
+              randomWithdrawAmount
+            )
+          } catch (e) {
+            console.info('Problem withdrawing: ' + e)
+          }
+
         // if (eventShouldOccur('SLEEP')) {
         //
         //   await exClient.leave()
@@ -172,7 +192,7 @@ async function main() {
       }
 
       if (
-        (true || eventShouldOccur('NEW_CLIENT')) &&
+        eventShouldOccur('NEW_CLIENT') &&
         numberOfClients < MAX_NUMBER_OF_CLIENTS
       ) {
         console.info('Creating a new client')
