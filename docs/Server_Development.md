@@ -85,6 +85,14 @@ Wait until you see operator logs, then run
 
     run-e2e-test
     
+#### Chaos testing
+
+```
+    > runChaosGeth.sh
+    > pnpm run start
+    > ts-node demo/chaos.ts 
+```
+    
 If you want to just run the server with docker do 
 (be sure the server of for the tests above is not running anymore):
 
