@@ -198,4 +198,18 @@ export class L2ClientChaos extends L2ClientForTest {
       )
     }
   }
+
+  public async fetchProofs(round: number) {
+    if (Math.random() > this.randomFailProbability) {
+      logger.info(
+        `Fetchproof successful for client ${this.address} and round ${round}.`
+      )
+      return super.fetchProofs(round)
+    } else {
+      logger.info(
+        `Fetchproof failed for client ${this.address} and round ${round}.`
+      )
+      return []
+    }
+  }
 }

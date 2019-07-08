@@ -49,7 +49,7 @@ const ODDS: { [event: string]: number } = {
   CANCEL_ORDER: 0.25,
   SLEEP: 0.25,
   BUY: 0.5,
-  FETCHFILL_FAILURE: 0.25
+  FAILURE: 0.25
 }
 
 function eventShouldOccur(eventName: string): boolean {
@@ -70,7 +70,7 @@ async function main() {
     })
 
     // Set the probability to miss the fills
-    l2Client.setRandomFailureProbability(ODDS['FETCHFILL_FAILURE'])
+    l2Client.setRandomFailureProbability(ODDS['FAILURE'])
 
     await l2Client.init()
 
