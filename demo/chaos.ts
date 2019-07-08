@@ -20,10 +20,10 @@ import {
   PrivateKeyIdentity
 } from '@oax/client'
 
-import { L2ClientForTest } from '../tests/libs/L2ClientForTest'
+import { L2ClientChaos } from '../tests/libs/L2ClientForTest'
 
 interface Client {
-  l2Client: L2ClientForTest
+  l2Client: L2ClientChaos
   exClient: ExchangeClient
 }
 
@@ -48,7 +48,8 @@ const ODDS: { [event: string]: number } = {
   CONFIRM_WITHDRAWAL: 0.25,
   CANCEL_ORDER: 0.25,
   SLEEP: 0.25,
-  BUY: 0.5
+  BUY: 0.5,
+  FETCHFILL_FAILURE: 0.25
 }
 
 function eventShouldOccur(eventName: string): boolean {
@@ -63,10 +64,13 @@ async function main() {
 
   async function createClient(): Promise<Client> {
     const id = new PrivateKeyIdentity(undefined, provider)
-    const l2Client = new L2ClientForTest(id, API_URL, {
+    const l2Client = new L2ClientChaos(id, API_URL, {
       operatorAddress: deployConfig.operator,
       mediator: deployConfig.mediator
     })
+
+    // Set the probability to miss the fills
+    l2Client.setRandomFailureProbability(ODDS['FETCHFILL_FAILURE'])
 
     await l2Client.init()
 

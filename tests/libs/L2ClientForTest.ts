@@ -12,6 +12,10 @@ import { IApproval } from '@oax/common/types/Approvals'
 import { ERC20 } from '@oax/contracts/wrappers/ERC20'
 import { D } from '@oax/common/BigNumberUtils'
 import { ProofCollection } from '@oax/common/persistence/ProofCollection'
+import { Round } from '../../src/common/types/BasicTypes'
+import { loggers } from '@oax/common/Logging'
+
+const logger = loggers.get('frontend')
 
 /**
  * A specialized L2Client used for testing only.
@@ -158,5 +162,40 @@ export class L2ClientForTest extends L2Client {
     const sig = await this.identity.signApprov(approvParams)
     const sigAsBytes = [...EthersUtils.arrayify(sig)].map(EthersUtils.hexlify)
     return sigAsBytes
+  }
+}
+
+/**
+ * A specialized L2Client used for chaos testing only.
+ *
+ * Protected methods and getters are exposed for verification / inserting random behaviour
+ */
+export class L2ClientChaos extends L2ClientForTest {
+  private randomFailProbability: number
+
+  constructor(
+    identity: Identity,
+    transport: HTTPClient | string,
+    options: L2ClientOptions
+  ) {
+    super(identity, transport, options)
+    this.randomFailProbability = 0
+  }
+
+  public setRandomFailureProbability(prob: number) {
+    this.randomFailProbability = prob
+  }
+
+  public async fetchFills(round: Round) {
+    if (Math.random() > this.randomFailProbability) {
+      logger.info(
+        `Fetchfill successful for client ${this.address} and round ${round}.`
+      )
+      return super.fetchFills(round)
+    } else {
+      logger.info(
+        `Fetchfill failed for client ${this.address} and round ${round}.`
+      )
+    }
   }
 }
