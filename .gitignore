@@ -14,3 +14,4 @@ deploy.json
 UTC--2*
 *.sqlite
 isolate-*.log
+misc/vagrant/.vagrant/
