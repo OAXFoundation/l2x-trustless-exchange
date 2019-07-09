@@ -37,7 +37,7 @@ On the DEV machine:
 > make
 ```
 - Go to the root folder of the enlistment
-- Open `bin/deployContracts.js` and customize the following two constants to match your setup:
+- Open `bin/deployContracts.ts` and customize the following two constants to match your setup:
 ```
 const GETH_RPC_URL = 'https://rinkeby.infura.io/v3/<your project key>'
 const OPERATOR_WALLET_FILEPATH = 'wallet/wallet.bin'
@@ -50,7 +50,7 @@ const DEPLOYER_PASSWORD = 'testtest'
 ```
 - Run the script
 ```
-node bin/deployContracts.js
+ts-node bin/deployContracts.ts
 ```
 This should produce output similar to this one, also showing the address of each one of the deployed contracts. We will need this later on to run the Hub.
 ```

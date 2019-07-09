@@ -4,15 +4,29 @@
 // https://www.oax.org/
 // See LICENSE file for license details.
 // ----------------------------------------------------------------------------
+
+import { JsonRpcSigner } from 'ethers/providers'
+import { Address } from '../src/common/types/BasicTypes'
+import { waitForMining } from '../src/common/ContractUtils'
+
 const fs = require('fs')
 const Path = require('path')
 const Ethers = require('ethers')
 const Promptly = require('promptly')
 
-const GETH_RPC_URL = 'http://127.0.0.1:8545'
-const OPERATOR_WALLET_FILEPATH = 'wallet/wallet.bin'
-const DEPLOYER_WALLET_FILEPATH = 'wallet/deploy.bin'
-const DEPLOYER_PASSWORD = "testtest"
+// const GETH_RPC_URL = 'http://127.0.0.1:8545'
+// const OPERATOR_WALLET_FILEPATH = 'wallet/wallet.bin'
+// const DEPLOYER_WALLET_FILEPATH = 'wallet/deploy.bin'
+// const DEPLOYER_PASSWORD = 'testtest'
+// const ROUND_SIZE = 32
+// const MAXIMUM_GAS = 6500000
+// const GAS_PRICE = 10e9 // 10GWei
+
+const GETH_RPC_URL =
+  'https://rinkeby.infura.io/v3/57c9a9f51c5c478a9752decfb8fc7f01'
+const OPERATOR_WALLET_FILEPATH = 'wallet.bin'
+const DEPLOYER_WALLET_FILEPATH = 'wallet.bin'
+const DEPLOYER_PASSWORD = 'hola'
 const ROUND_SIZE = 32
 const MAXIMUM_GAS = 6500000
 const GAS_PRICE = 10e9 // 10GWei
@@ -22,8 +36,8 @@ async function run() {
   const provider = new Ethers.providers.JsonRpcProvider(GETH_RPC_URL)
 
   // Load wallets
-  var deployerSigner = null
-  var operatorSigner = null
+  let deployerSigner = null
+  let operatorSigner = null
 
   if (process.argv.length > 2 && process.argv[2] == '--UseTestWallets') {
     console.log('Loading test wallets from geth...')
@@ -51,9 +65,17 @@ async function run() {
   console.log('')
 
   // Deploy the token contracts
-  const oaxContractAddress = await deployToken('OAXToken', 'ETHToken', deployerSigner)
+  const oaxContractAddress = await deployToken(
+    'OAXToken',
+    'ETHToken',
+    deployerSigner
+  )
   console.log('')
-  const wethContractAddress = await deployToken('ETHToken', 'ETHToken', deployerSigner)
+  const wethContractAddress = await deployToken(
+    'ETHToken',
+    'ETHToken',
+    deployerSigner
+  )
   console.log('')
 
   // Deploy the mediator contract
@@ -65,16 +87,20 @@ async function run() {
 
   const mediatorContract = await loadContract(
     'Mediator',
-    mediatorContractAddress,
+    mediatorContractAddress!,
     operatorSigner
   )
   console.log('')
 
   // Register assets
   console.log('Registering OAX token with Mediator...')
-  await mediatorContract.functions.registerToken(oaxContractAddress, {gasPrice: GAS_PRICE})
+  await mediatorContract.functions.registerToken(oaxContractAddress, {
+    gasPrice: GAS_PRICE
+  })
   console.log('Registering WETH token with Mediator...')
-  await mediatorContract.functions.registerToken(wethContractAddress, {gasPrice: GAS_PRICE})
+  await mediatorContract.functions.registerToken(wethContractAddress, {
+    gasPrice: GAS_PRICE
+  })
   console.log('')
 
   const o = {
@@ -93,7 +119,7 @@ async function run() {
   console.log('Deployment completed successfully.')
 }
 
-async function loadWalletFromFile(filePath, providedPassword) {
+async function loadWalletFromFile(filePath: string, providedPassword?: string) {
   if (!fs.existsSync(filePath)) {
     throw Error('Could not find wallet file ' + filePath)
   }
@@ -110,7 +136,11 @@ async function loadWalletFromFile(filePath, providedPassword) {
   return await Ethers.Wallet.fromEncryptedJson(fileContent, password)
 }
 
-async function deployToken(name, contractName, signer) {
+async function deployToken(
+  name: string,
+  contractName: string,
+  signer: JsonRpcSigner
+) {
   const factory = getContractFactory(contractName, signer)
 
   console.log(`Deploying token ${name}.`)
@@ -118,10 +148,11 @@ async function deployToken(name, contractName, signer) {
   tx.gasLimit = MAXIMUM_GAS
   tx.gasPrice = GAS_PRICE
 
-  const txSent = await signer.sendTransaction(tx)
+  const txSentPromise = signer.sendTransaction(tx)
+  const txSent = await txSentPromise
   console.log(`Sent tx with hash ${txSent.hash}. Waiting for mining...`)
 
-  const txReceipt = await waitForMining(txSent)
+  const txReceipt = await waitForMining(txSentPromise)
 
   const contractAddress = txReceipt.contractAddress
 
@@ -130,7 +161,11 @@ async function deployToken(name, contractName, signer) {
   return contractAddress
 }
 
-async function deployMediator(operatorAddress, roundSize, signer) {
+async function deployMediator(
+  operatorAddress: Address,
+  roundSize: number,
+  signer: JsonRpcSigner
+) {
   const factory = getContractFactory('Mediator', signer)
 
   console.log(
@@ -140,10 +175,11 @@ async function deployMediator(operatorAddress, roundSize, signer) {
   tx.gasLimit = MAXIMUM_GAS
   tx.gasPrice = GAS_PRICE
 
-  const txSent = await signer.sendTransaction(tx)
-  console.log(`Sent tx with hash ${txSent.hash}. Waiting for mining...`)
+  const txSentPromise = signer.sendTransaction(tx)
+  const txSent = await txSentPromise
 
-  const txReceipt = await waitForMining(txSent)
+  const txReceipt = await waitForMining(txSentPromise)
+  console.log(`Sent tx with hash ${txSent.hash}. Waiting for mining...`)
 
   const contractAddress = txReceipt.contractAddress
 
@@ -152,7 +188,7 @@ async function deployMediator(operatorAddress, roundSize, signer) {
   return contractAddress
 }
 
-function getContractFactory(name, signer) {
+function getContractFactory(name: string, signer: JsonRpcSigner) {
   const abi = fs
     .readFileSync(Path.join(projectRoot(), `build/contracts/${name}.abi`))
     .toString()
@@ -175,16 +211,14 @@ function projectRoot() {
   return dir
 }
 
-async function loadContract(name, contractAddress, signer) {
+async function loadContract(
+  name: string,
+  contractAddress: string,
+  signer: JsonRpcSigner
+) {
   const factory = getContractFactory(name, signer)
 
   return new Ethers.Contract(contractAddress, factory.interface, signer)
-}
-
-async function waitForMining(txPromise) {
-  const tx = await txPromise
-
-  return tx.wait()
 }
 
 run().catch(e => {
