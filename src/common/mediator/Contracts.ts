@@ -44,6 +44,9 @@ export class MediatorAsync implements IMediatorAsync {
   private readonly contractWithSigner: Contract
   readonly contractAddress: Address
   private readonly logger?: winston.LoggerInstance
+  private methodGasLimit = {
+    commit: 200000
+  }
   private gasLimit: number = 0
   private gasPrice: number = 0
 
@@ -63,7 +66,11 @@ export class MediatorAsync implements IMediatorAsync {
     const tx = await txPromise
 
     if (this.logger) {
-      this.logger.info(`Tx hash: ${tx.hash}`)
+      this.logger.info('Transaction sent:', {
+        gasPrice: tx.gasPrice.toString(),
+        gasLimit: tx.gasLimit.toString(),
+        txHash: tx.hash
+      })
     }
 
     return tx.wait()
@@ -108,11 +115,10 @@ export class MediatorAsync implements IMediatorAsync {
     ).toSol()
 
     return await this.waitForMiningAndLog(
-      this.contractWithSigner.functions.commit(
-        rootInfoSol,
-        tokenAddress,
-        this.getGasLimitParams()
-      )
+      this.contractWithSigner.functions.commit(rootInfoSol, tokenAddress, {
+        ...this.getGasLimitParams(),
+        gasLimit: this.methodGasLimit.commit
+      })
     )
   }
 
