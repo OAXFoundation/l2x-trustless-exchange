@@ -45,6 +45,7 @@ export class MediatorAsync implements IMediatorAsync {
   readonly contractAddress: Address
   private readonly logger?: winston.LoggerInstance
   private gasLimit: number = 0
+  private gasPrice: number = 0
 
   constructor(
     signer: Signer,
@@ -72,9 +73,22 @@ export class MediatorAsync implements IMediatorAsync {
     this.gasLimit = gasLimit
   }
 
+  public setGasPrice(gasPrice: number) {
+    this.gasPrice = gasPrice
+  }
+
   private getGasLimitParams() {
-    if (this.gasLimit === 0) return {}
-    else return { gasLimit: this.gasLimit }
+    let opts: any = {}
+
+    if (this.gasLimit !== 0) {
+      opts.gasLimit = this.gasLimit
+    }
+
+    if (this.gasPrice !== 0) {
+      opts.gasPrice = this.gasPrice
+    }
+
+    return opts
   }
 
   getContractWrapper() {
