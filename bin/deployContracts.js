@@ -14,7 +14,7 @@ const OPERATOR_WALLET_FILEPATH = 'wallet/wallet.bin'
 const DEPLOYER_WALLET_FILEPATH = 'wallet/deploy.bin'
 const DEPLOYER_PASSWORD = "testtest"
 const ROUND_SIZE = 32
-const MAXIMUM_GAS = 7000000
+const MAXIMUM_GAS = 6500000
 const GAS_PRICE = 10e9 // 10GWei
 
 async function run() {
