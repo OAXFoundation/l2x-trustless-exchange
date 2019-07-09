@@ -79,13 +79,19 @@ Saved deployment info to deploy.json.
 Deployment completed successfully.
 ```
 
-### Building the Hub Docker image
+### Operator Server
+#### Building the Hub Docker image
 You can build the docker image from the OAX enlistment using the following command:
 ```
 pnpm run build-docker
-# copy to server
+```
+
+#### Pushing the docker image
+```
 docker save oax/server | ssh -C user@host docker load
 ```
+
+#### Creating the operator docker container
 Stop and remove the existing container on the host if it exists.
 ```
 systemctl stop oax
@@ -93,11 +99,10 @@ docker stop oax
 docker rm oax
 ```
 
-### Running the Hub Docker image
 The target machine will need to have the Docker image and also the encrypted operator wallet file (we'll refer to it as wallet.bin)
 Create a `.sh` file similar to this one:
 ```
-docker run -it \
+docker create -it \
             -p 8899:8899 \
             -v /localFolderWithWalletFile:/app/mount \
             -e GETH_RPC_URL="http://127.0.0.1:8545" \
@@ -113,20 +118,13 @@ docker run -it \
 ```
 or, using `.env` file with all environment settings:
 ```
-docker run -it \
+docker create -it \
             -p 8899:8899 \
             -v /localFolderWithWalletFile:/app/mount \
             --env-file .env \
             --name oax \
             oax/server:latest
 ```
-Once container is running, stop it from another terminal on the server, then
-hand over control to systemd:
-```
-docker stop oax
-systemctl start operator
-```
-
 
 A few important parameters to customize above:
 - `localFolderWithWalletFile` should be the full folder path on the local machine where the encrypted wallet file is lodated (e.g. `/Users/hubUser/mount`).
@@ -139,9 +137,17 @@ A few important parameters to customize above:
 
 NOTE: Make sure that port 8899 is open on the firewall if you want to be able to connect to it remotely.
 
-
-Once you run this script, the hub should start and initialize without errors. You should see log output similar to this:
-
+#### Starting the operator server
+After the `oax` docker container has been created the container should be
+started with `systemd`.
+```
+systemctl start operator
+```
+To check the status of the server run
+```
+systemctl status operator
+```
+The hub should start and initialize without errors. You should see log output similar to this:
 ```
 info: Loaded operator wallet with address 0xBC3AdE3dFdE456ab5f531F32E6fa04658ED80f3b {"timestamp":"2019-04-20T05:55:33.794Z"}
 info: Register 0xBC3AdE3dFdE456ab5f531F32E6fa04658ED80f3b. {"timestamp":"2019-04-20T05:55:33.842Z"}
@@ -153,6 +159,14 @@ info: Creating operator. {"timestamp":"2019-04-20T05:55:33.854Z"}
 info: Ledger starting... {"timestamp":"2019-04-20T05:55:33.858Z"}
 [...]
 ```
+
+#### Updating the operator docker container
+Assuming you followed the steps above before (using the `.env` file), you can
+run the following after building the docker container to update the operator.
+```
+env SSH_CON=[user]@[host] deploy-operator
+```
+Note this will only deploy the new container but not deploy the contracts.
 
 ### Try it with the CLI
 You can now connect to the hub and experiment with it, using the client libraries, the CLI or REST APIs. Here are instructions on how connect with the CLI.

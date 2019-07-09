@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Usage:
+#
+#     $env SSH_CON=... VERSION=... deploy-operator
+#
+#     defaults:
+#       - version: current git sha
+#
+set -euxo pipefail
+
+VERSION="${VERSION:-$(git rev-parse HEAD)}"
+IMAGE="oax/server:$VERSION"
+
+if ! docker inspect --type=image $IMAGE > /dev/null; then
+    echo ""
+    echo "The image $IMAGE does not exist."
+    echo "Did you build with dirty working directory?"
+    echo ""
+    exit 1
+fi
+
+echo "Copying image $IMAGE to host $SSH_CON"
+docker save oax/server:"$VERSION" | ssh -C $SSH_CON docker load
+
+cat bin/install-operator | ssh -A $SSH_CON VERSION=$VERSION bash

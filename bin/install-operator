@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+#
+# To use this script execute it on the operator host.
+#
+set -euxo pipefail
+
+# remove old container
+sudo systemctl stop operator || true
+docker stop oax || true
+docker rm oax || true
+
+# create new operator container
+docker create -it \
+    -p 8899:8899 \
+    -v $(pwd)/mount:/app/mount \
+    --env-file .env \
+    --name oax \
+    oax/server:"$VERSION"
+
+# start container
+sudo systemctl start operator
+
+echo 'waiting for operator to start ...'
+sleep 5
+systemctl status operator

@@ -14,7 +14,8 @@ rm -r build/docker/ 2> /dev/null || true
 
 # Create version
 mkdir -p build/docker/public
-git describe --match=NeVeRmAtCh --always --abbrev=40 --dirty > build/docker/public/HEAD
+VERSION="$(git describe --match=NeVeRmAtCh --always --abbrev=40 --dirty)"
+echo "$VERSION" > build/docker/public/HEAD
 
 # Copy files
 rsync -av Dockerfile build/docker/
@@ -29,4 +30,4 @@ rsync -av --include "*/" --include "*.js" --exclude "*" "build/dist/src/" "build
 touch -a build/docker/.env
 touch -a build/docker/.contract_build_root
 
-docker build -t oax/server build/docker/
+docker build -t oax/server:"$VERSION" -t oax/server:latest build/docker/
