@@ -22,4 +22,4 @@ fi
 echo "Copying image $IMAGE to host $SSH_CON"
 docker save oax/server:"$VERSION" | ssh -C $SSH_CON docker load
 
-cat bin/install-operator | ssh -A $SSH_CON VERSION=$VERSION bash
+cat bin/install-operator | ssh -A $SSH_CON env VERSION=$VERSION bash
