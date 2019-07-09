@@ -112,7 +112,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "pnpm run check-format"
+      "pre-commit": "check-format-modified-files"
     }
   },
   "dependencies": {
