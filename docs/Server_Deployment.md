@@ -37,16 +37,15 @@ On the DEV machine:
 > make
 ```
 - Go to the root folder of the enlistment
-- Open `bin/deployContracts.ts` and customize the following two constants to match your setup:
+- Open `.env` and customize the following constants to match your setup:
 ```
-const GETH_RPC_URL = 'https://rinkeby.infura.io/v3/<your project key>'
-const OPERATOR_WALLET_FILEPATH = 'wallet/wallet.bin'
-const DEPLOYER_WALLET_FILEPATH = 'wallet/deploy.bin'
-const ROUND_SIZE = 240
-```
-- Comment out the following line so you get prompted for password instead:
-```
-const DEPLOYER_PASSWORD = 'testtest'
+GETH_RPC_URL=https://rinkeby.infura.io/v3/...
+
+# Deployment
+OPERATOR_WALLET_FILEPATH = 'wallet/wallet.bin'
+DEPLOYER_WALLET_FILEPATH = 'wallet/deploy.bin'
+DEPLOYER_PASSWORD = 'hola'
+ROUND_SIZE = 32
 ```
 - Run the script
 ```

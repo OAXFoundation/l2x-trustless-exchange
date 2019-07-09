@@ -14,22 +14,15 @@ const Path = require('path')
 const Ethers = require('ethers')
 const Promptly = require('promptly')
 
-// const GETH_RPC_URL = 'http://127.0.0.1:8545'
-// const OPERATOR_WALLET_FILEPATH = 'wallet/wallet.bin'
-// const DEPLOYER_WALLET_FILEPATH = 'wallet/deploy.bin'
-// const DEPLOYER_PASSWORD = 'testtest'
-// const ROUND_SIZE = 32
-// const MAXIMUM_GAS = 6500000
-// const GAS_PRICE = 10e9 // 10GWei
-
-const GETH_RPC_URL =
-  'https://rinkeby.infura.io/v3/57c9a9f51c5c478a9752decfb8fc7f01'
-const OPERATOR_WALLET_FILEPATH = 'wallet.bin'
-const DEPLOYER_WALLET_FILEPATH = 'wallet.bin'
-const DEPLOYER_PASSWORD = 'hola'
-const ROUND_SIZE = 32
-const MAXIMUM_GAS = 6500000
-const GAS_PRICE = 10e9 // 10GWei
+import {
+  GETH_RPC_URL,
+  DEPLOYER_WALLET_FILEPATH,
+  DEPLOYER_PASSWORD,
+  OPERATOR_WALLET_FILEPATH,
+  ROUND_SIZE,
+  GAS_PRICE,
+  GAS_LIMIT
+} from '../config/environment'
 
 async function run() {
   // Connect to blockchain node
@@ -47,11 +40,11 @@ async function run() {
   } else {
     console.log('Loading wallets from disk...')
     const deployerWallet = await loadWalletFromFile(
-      DEPLOYER_WALLET_FILEPATH,
+      DEPLOYER_WALLET_FILEPATH!,
       DEPLOYER_PASSWORD
     )
 
-    const operatorWallet = await loadWalletFromFile(OPERATOR_WALLET_FILEPATH)
+    const operatorWallet = await loadWalletFromFile(OPERATOR_WALLET_FILEPATH!)
 
     deployerSigner = deployerWallet.connect(provider)
     operatorSigner = operatorWallet.connect(provider)
@@ -145,7 +138,7 @@ async function deployToken(
 
   console.log(`Deploying token ${name}.`)
   const tx = factory.getDeployTransaction()
-  tx.gasLimit = MAXIMUM_GAS
+  tx.gasLimit = GAS_LIMIT
   tx.gasPrice = GAS_PRICE
 
   const txSentPromise = signer.sendTransaction(tx)
@@ -172,7 +165,7 @@ async function deployMediator(
     `Deploying mediator for operator ${operatorAddress}, ${roundSize}-block rounds.`
   )
   let tx = factory.getDeployTransaction(roundSize, operatorAddress)
-  tx.gasLimit = MAXIMUM_GAS
+  tx.gasLimit = GAS_LIMIT
   tx.gasPrice = GAS_PRICE
 
   const txSentPromise = signer.sendTransaction(tx)
