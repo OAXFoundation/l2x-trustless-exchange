@@ -7,5 +7,5 @@ FILES="$(git diff $REV --name-only -- '*.ts' 'src/*.js')"
 if [ -z "$FILES" ]; then
     echo "No files to check."
 else
-    exec prettier --write $FILES
+    exec prettier --list-different $FILES
 fi
