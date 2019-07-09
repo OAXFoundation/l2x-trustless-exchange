@@ -16,7 +16,8 @@ import {
   CONTRACTS,
   STORAGE_DIR,
   FEE_AMOUNT_WEI,
-  GAS_LIMIT
+  GAS_LIMIT,
+  GAS_PRICE
 } from '../../config/environment'
 import { loggers } from '../common/Logging'
 import fs from 'fs'
@@ -175,6 +176,7 @@ async function main(): Promise<void> {
   )
 
   mediatorAsync.setGasLimit(GAS_LIMIT)
+  mediatorAsync.setGasPrice(GAS_PRICE)
 
   const operator = new Operator(identity!, mediatorAsync, provider, metaLedger)
 
