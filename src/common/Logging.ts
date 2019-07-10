@@ -6,6 +6,8 @@
 
 import fs from 'fs'
 import winston from 'winston'
+import { DiscordWebHook } from '@oax/common/logging/DiscordWebHookTransport'
+import { DISCORD_WEBHOOK_URL } from '../../config/environment'
 
 if (process.env.NODE_ENV !== 'docker') {
   // Winston 2.x requires the log directtory to exist
@@ -85,20 +87,34 @@ if (process.env.NODE_ENV === 'perf') {
     ]
   })
 } else {
-  loggers.add('backend', {
-    transports: [
-      new transports.Console({
-        colorize: true,
-        prettyPrint: true,
-        timestamp: true,
-        level: 'info'
-      }),
-      new transports.File({
-        filename: 'logs/backend-prod.log',
-        level: 'info'
+  // production / default loggers
+
+  const backendTransports: winston.TransportInstance[] = [
+    new transports.Console({
+      colorize: true,
+      prettyPrint: true,
+      timestamp: true,
+      level: 'info'
+    }),
+    new transports.File({
+      filename: 'logs/backend-prod.log',
+      level: 'info'
+    })
+  ]
+
+  if (DISCORD_WEBHOOK_URL) {
+    backendTransports.push(
+      new DiscordWebHook({
+        url: DISCORD_WEBHOOK_URL,
+        level: 'error'
       })
-    ]
+    )
+  }
+
+  loggers.add('backend', {
+    transports: backendTransports
   })
+
   loggers.add('frontend', {
     transports: [
       new transports.Console({

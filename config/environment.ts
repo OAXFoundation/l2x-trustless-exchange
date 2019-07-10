@@ -34,6 +34,8 @@ export const WALLET_PASSWORD = process.env.WALLET_PASSWORD
 export const GAS_LIMIT = Number(process.env.GAS_LIMIT || '6800000')
 export const GAS_PRICE = parseInt(process.env.GAS_PRICE || '10000000000')
 
+export const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL
+
 function ensureConfigExist(configName: string) {
   if (process.env[configName] === undefined) {
     const msg = `Mandatory environment variable ${configName} is missing`
