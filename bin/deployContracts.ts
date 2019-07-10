@@ -28,6 +28,8 @@ async function run() {
   // Connect to blockchain node
   const provider = new Ethers.providers.JsonRpcProvider(GETH_RPC_URL)
 
+  console.log(`Deploying at ${GETH_RPC_URL}`)
+
   // Load wallets
   let deployerSigner = null
   let operatorSigner = null
@@ -112,7 +114,10 @@ async function run() {
   console.log('Deployment completed successfully.')
 }
 
-async function loadWalletFromFile(filePath: string, providedPassword?: string) {
+export async function loadWalletFromFile(
+  filePath: string,
+  providedPassword?: string
+) {
   if (!fs.existsSync(filePath)) {
     throw Error('Could not find wallet file ' + filePath)
   }

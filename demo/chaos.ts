@@ -6,10 +6,14 @@
 import fs from 'fs'
 import BigNumber from 'bignumber.js'
 
-import { JsonRpcProvider } from 'ethers/providers'
+import { JsonRpcProvider, JsonRpcSigner } from 'ethers/providers'
 import { D, etherToD, toEthersBn } from '@oax/common/BigNumberUtils'
 
-import { GETH_RPC_URL } from '../config/environment'
+import {
+  DEPLOYER_PASSWORD,
+  DEPLOYER_WALLET_FILEPATH,
+  GETH_RPC_URL
+} from '../config/environment'
 const API_URL = 'http://127.0.0.1:8899'
 const MAX_NUMBER_OF_CLIENTS = 40
 
@@ -21,6 +25,7 @@ import {
 } from '@oax/client'
 
 import { L2ClientChaos } from '../tests/libs/L2ClientForTest'
+import { loadWalletFromFile } from '../bin/deployContracts'
 
 interface Client {
   l2Client: L2ClientChaos
@@ -57,8 +62,41 @@ function eventShouldOccur(eventName: string): boolean {
   return Math.random() <= ODDS[eventName]
 }
 
+/**
+ * Obtains the signer object of the deployer depending on the ethereum network (local or testnet)
+ */
+
+async function getDeployerSigner(): Promise<JsonRpcSigner> {
+  // If the Ethereum is running locally
+  const providerUrl = GETH_RPC_URL
+  console.log(`GETH_RPC_URL: ${GETH_RPC_URL}`)
+
+  let deployerSigner: JsonRpcSigner
+
+  const runsOnLocalhost: boolean =
+    providerUrl.indexOf('127.0.0.1') >= 0 ||
+    providerUrl.indexOf('localhost') >= 0
+  console.log(runsOnLocalhost)
+
+  //TODO this should be handled differently as promises are involved
+  if (runsOnLocalhost) {
+    console.log('Local deployer')
+    deployerSigner = await provider.getSigner(1)
+    // Otherwise (Rinkeby, Ropsten, etc...)
+  } else {
+    console.log('Testnet deployer')
+    let deployerWallet = await loadWalletFromFile(
+      DEPLOYER_WALLET_FILEPATH!,
+      DEPLOYER_PASSWORD
+    )
+    deployerSigner = await deployerWallet.connect(provider)
+  }
+
+  return deployerSigner
+}
+
 async function main() {
-  const deployerSigner = provider.getSigner(1)
+  const deployerSigner = await getDeployerSigner()
 
   const deployConfig = JSON.parse(fs.readFileSync('deploy.json').toString())
 
