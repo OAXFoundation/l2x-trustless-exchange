@@ -25,7 +25,7 @@ import {
 } from '@oax/client'
 
 import { L2ClientChaos } from '../tests/libs/L2ClientForTest'
-import { loadWalletFromFile } from '../bin/deployContracts'
+import { loadWalletFromFile } from '../bin/utils'
 
 interface Client {
   l2Client: L2ClientChaos
@@ -67,7 +67,6 @@ function eventShouldOccur(eventName: string): boolean {
  */
 
 async function getDeployerSigner(): Promise<JsonRpcSigner> {
-  // If the Ethereum is running locally
   const providerUrl = GETH_RPC_URL
   console.log(`GETH_RPC_URL: ${GETH_RPC_URL}`)
 
@@ -76,15 +75,14 @@ async function getDeployerSigner(): Promise<JsonRpcSigner> {
   const runsOnLocalhost: boolean =
     providerUrl.indexOf('127.0.0.1') >= 0 ||
     providerUrl.indexOf('localhost') >= 0
-  console.log(runsOnLocalhost)
 
-  //TODO this should be handled differently as promises are involved
+  // Fetch local signer
+
   if (runsOnLocalhost) {
-    console.log('Local deployer')
     deployerSigner = await provider.getSigner(1)
-    // Otherwise (Rinkeby, Ropsten, etc...)
   } else {
-    console.log('Testnet deployer')
+    // Fetch testnet signer
+
     let deployerWallet = await loadWalletFromFile(
       DEPLOYER_WALLET_FILEPATH!,
       DEPLOYER_PASSWORD

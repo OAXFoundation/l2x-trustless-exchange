@@ -12,7 +12,6 @@ import { waitForMining } from '../src/common/ContractUtils'
 const fs = require('fs')
 const Path = require('path')
 const Ethers = require('ethers')
-const Promptly = require('promptly')
 
 import {
   GETH_RPC_URL,
@@ -23,12 +22,15 @@ import {
   GAS_PRICE,
   GAS_LIMIT
 } from '../config/environment'
+import { loadWalletFromFile } from './utils'
 
 async function run() {
   // Connect to blockchain node
   const provider = new Ethers.providers.JsonRpcProvider(GETH_RPC_URL)
 
   console.log(`Deploying at ${GETH_RPC_URL}`)
+  console.log(`Gas limit: ${GAS_LIMIT}`)
+  console.log(`Gas price: ${GAS_PRICE}`)
 
   // Load wallets
   let deployerSigner = null
@@ -112,26 +114,6 @@ async function run() {
   console.log(`Saved deployment info to ${fname}.`)
 
   console.log('Deployment completed successfully.')
-}
-
-export async function loadWalletFromFile(
-  filePath: string,
-  providedPassword?: string
-) {
-  if (!fs.existsSync(filePath)) {
-    throw Error('Could not find wallet file ' + filePath)
-  }
-
-  const password =
-    providedPassword == undefined
-      ? await Promptly.prompt(`Enter wallet password for ${filePath}: `, {
-          silent: true
-        })
-      : providedPassword
-
-  const fileContent = fs.readFileSync(filePath).toString()
-
-  return await Ethers.Wallet.fromEncryptedJson(fileContent, password)
 }
 
 async function deployToken(
