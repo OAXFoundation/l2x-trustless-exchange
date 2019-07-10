@@ -10,7 +10,7 @@ fund-wallet $OPERATOR_ADDRESS 100e18
 pnpm run clean-build
 docker_build.sh
 
-echo testtest | deployContracts.js
+echo testtest | deployContracts.ts
 
 # capture token addresses
 CONTRACT_OAXToken=$(cat deploy.json | jq -r .assets.OAX)

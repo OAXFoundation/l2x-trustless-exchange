@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env ts-node
 // ----------------------------------------------------------------------------
 // Copyright (c) 2018,2019 OAX Foundation.
 // https://www.oax.org/
@@ -221,4 +221,5 @@ async function loadContract(
 
 run().catch(e => {
   console.log(e)
+  process.exitCode = 1
 })
