@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Deploy contracts
-node bin/deployContracts.js --UseTestWallets
+ts-node bin/deployContracts.ts --UseTestWallets
 
 # Set env
 #GETH_RPC_URL="http://127.0.0.1:8545" \
