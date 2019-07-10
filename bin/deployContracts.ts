@@ -26,11 +26,22 @@ import { loadWalletFromFile } from './utils'
 
 async function run() {
   // Connect to blockchain node
+
   const provider = new Ethers.providers.JsonRpcProvider(GETH_RPC_URL)
 
   console.log(`Deploying at ${GETH_RPC_URL}`)
   console.log(`Gas limit: ${GAS_LIMIT}`)
   console.log(`Gas price: ${GAS_PRICE}`)
+
+  let transactionOptions: any
+
+  if (GAS_PRICE === 0) {
+    transactionOptions = {}
+  } else {
+    transactionOptions = {
+      gasPrice: GAS_PRICE
+    }
+  }
 
   // Load wallets
   let deployerSigner = null
@@ -91,14 +102,19 @@ async function run() {
 
   // Register assets
   console.log('Registering OAX token with Mediator...')
-  await mediatorContract.functions.registerToken(oaxContractAddress, {
-    gasPrice: GAS_PRICE
-  })
+  await waitForMining(
+    mediatorContract.functions.registerToken(
+      oaxContractAddress,
+      transactionOptions
+    )
+  )
   console.log('Registering WETH token with Mediator...')
-  await mediatorContract.functions.registerToken(wethContractAddress, {
-    gasPrice: GAS_PRICE
-  })
-  console.log('')
+  await waitForMining(
+    mediatorContract.functions.registerToken(
+      wethContractAddress,
+      transactionOptions
+    )
+  )
 
   const o = {
     assets: {
@@ -125,8 +141,10 @@ async function deployToken(
 
   console.log(`Deploying token ${name}.`)
   const tx = factory.getDeployTransaction()
-  tx.gasLimit = GAS_LIMIT
-  tx.gasPrice = GAS_PRICE
+  if (GAS_PRICE !== 0) {
+    tx.gasLimit = GAS_LIMIT
+    tx.gasPrice = GAS_PRICE
+  }
 
   const txSentPromise = signer.sendTransaction(tx)
   const txSent = await txSentPromise
@@ -152,8 +170,11 @@ async function deployMediator(
     `Deploying mediator for operator ${operatorAddress}, ${roundSize}-block rounds.`
   )
   let tx = factory.getDeployTransaction(roundSize, operatorAddress)
-  tx.gasLimit = GAS_LIMIT
-  tx.gasPrice = GAS_PRICE
+
+  if (GAS_PRICE !== 0) {
+    tx.gasLimit = GAS_LIMIT
+    tx.gasPrice = GAS_PRICE
+  }
 
   const txSentPromise = signer.sendTransaction(tx)
   const txSent = await txSentPromise
