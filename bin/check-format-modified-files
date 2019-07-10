@@ -2,10 +2,12 @@
 set -euo pipefail
 
 REV="${1:-HEAD}"
-FILES="$(git diff $REV --name-only -- '*.ts' 'src/*.js')"
 
-if [ -z "$FILES" ]; then
+# Exclude deleted files with --diff-filter=d
+CHANGED_FILES="$(git diff $REV --diff-filter=d --name-only -- '*.ts' 'src/*.js')"
+
+if [ -z "$CHANGED_FILES" ]; then
     echo "No files to check."
 else
-    exec prettier --list-different $FILES
+    exec prettier --list-different $CHANGED_FILES
 fi
