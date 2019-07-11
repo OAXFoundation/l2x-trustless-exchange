@@ -26,8 +26,9 @@ import {
 } from '@oax/client'
 
 import { L2ClientChaos } from '../tests/libs/L2ClientForTest'
-import { loadWalletFromFile } from '../bin/utils'
+import { loadWalletFromFile, sleep } from '../bin/utils'
 import { waitForMining } from '../src/common/ContractUtils'
+import { Address } from '../src/common/types/BasicTypes'
 
 interface Client {
   l2Client: L2ClientChaos
@@ -49,7 +50,7 @@ const FUND_AMOUNT_ETHER = D('1000')
 const TOKEN_AMOUNT_ETHER = D('10')
 
 // After this round the mediator halts
-const ROUND_HALT: number = 2
+const ROUND_HALT: number = 3
 
 const ODDS: { [event: string]: number } = {
   NEW_CLIENT: 0.75,
@@ -59,7 +60,7 @@ const ODDS: { [event: string]: number } = {
   CANCEL_ORDER: 0.25,
   SLEEP: 0.25,
   BUY: 0.5,
-  FAILURE: 0.25
+  FAILURE: 0.05
 }
 
 function eventShouldOccur(eventName: string): boolean {
@@ -102,6 +103,14 @@ async function main() {
   const deployerSigner = await getDeployerSigner()
 
   const deployConfig = JSON.parse(fs.readFileSync('deploy.json').toString())
+
+  const mediatorContractName = MOCK_MEDIATOR ? 'MediatorMockChaos' : 'Mediator'
+
+  const mediator = getContract(
+    deployConfig.mediator,
+    mediatorContractName,
+    deployerSigner
+  )
 
   async function createClient(): Promise<Client> {
     const id = new PrivateKeyIdentity(undefined, provider)
@@ -157,13 +166,58 @@ async function main() {
     return { l2Client, exClient }
   }
 
-  const mediatorContractName = MOCK_MEDIATOR ? 'MediatorMockChaos' : 'Mediator'
+  async function checkFundsRecovery(
+    l2Client: L2ClientChaos,
+    tokenAddress: Address
+  ) {
+    let successfullRecovery: boolean
+    const clientAddress = l2Client.address
 
-  const mediator = getContract(
-    deployConfig.mediator,
-    mediatorContractName,
-    deployerSigner
-  )
+    successfullRecovery = await mediator.functions.recovered(
+      tokenAddress,
+      clientAddress
+    )
+
+    const RETRY = 5
+    const WAIT_BETWEEN_RETRY = 5
+    let retry = 0
+
+    while (!successfullRecovery && retry < RETRY) {
+      console.info(
+        `Waiting for client ${clientAddress} to recover ${tokenAddress}...`
+      )
+      await sleep(WAIT_BETWEEN_RETRY * 1000)
+      successfullRecovery = await mediator.functions.recovered(
+        tokenAddress,
+        clientAddress
+      )
+    }
+
+    if (successfullRecovery) {
+      console.info(
+        `Client ${clientAddress} successfully recovered his ${tokenAddress} tokens.`
+      )
+    } else {
+      console.error(
+        `Client ${clientAddress} failed to recover his ${tokenAddress} tokens.`
+      )
+    }
+
+    // Checking again
+    successfullRecovery = await mediator.functions.recovered(
+      tokenAddress,
+      clientAddress
+    )
+    if (successfullRecovery)
+      console.info(
+        `Client ${clientAddress} successfully recovered his ${tokenAddress}tokens.`
+      )
+    else {
+      console.error(
+        `Client ${clientAddress} could not recover his ${tokenAddress} tokens.`
+      )
+    }
+  }
 
   // @ts-ignore
   const BLOCKS_PER_ROUND = (await mediator.roundSize()).toNumber()
@@ -188,14 +242,18 @@ async function main() {
         console.log(`Halting the mediator...`)
         await waitForMining(mediator.functions.halt())
 
+        const seconds = 5
+        console.log(`Sleeping ${seconds} seconds...`)
+        await sleep(seconds * 1000)
+
         for (const client of clients) {
           const l2Client = client.l2Client
-
-          console.info(`Client ${l2Client.address} recovering WETH...`)
-          await l2Client.recoverFunds(deployConfig.assets.WETH)
-
-          console.info(`Client ${l2Client.address} recovering OAX...`)
-          await l2Client.recoverFunds(deployConfig.assets.OAX)
+          try {
+            await checkFundsRecovery(l2Client, deployConfig.assets.OAX)
+            await checkFundsRecovery(l2Client, deployConfig.assets.WETH)
+          } catch (e) {
+            console.error('Error when trying to recover funds... ' + e)
+          }
         }
       }
     }
@@ -220,15 +278,18 @@ async function main() {
          amount: ${orderAmt}
          price: ${orderPrice}`)
 
-        const orderId = await exClient.createOrder(
-          orderSym,
-          orderType,
-          orderSide,
-          orderAmt,
-          orderPrice
-        )
-
-        console.info(`Order created successfully with order ID ${orderId}`)
+        try {
+          const orderId = await exClient.createOrder(
+            orderSym,
+            orderType,
+            orderSide,
+            orderAmt,
+            orderPrice
+          )
+          console.info(`Order created successfully with order ID ${orderId}`)
+        } catch (e) {
+          console.error('Error when placing order... ' + e)
+        }
 
         const randomWithdrawAmount = D(
           Math.floor(Math.random() * 5000000000000000000).toString(10)
@@ -262,27 +323,30 @@ async function main() {
         numberOfClients < MAX_NUMBER_OF_CLIENTS
       ) {
         console.info('Creating a new client')
-        const client = await createClient()
+        try {
+          const client = await createClient()
+          numberOfClients++
 
-        numberOfClients++
+          const { exClient, l2Client } = client
 
-        const { exClient, l2Client } = client
+          await exClient.join()
 
-        await exClient.join()
+          await exClient.deposit(
+            deployConfig.assets.OAX,
+            TOKEN_AMOUNT_ETHER,
+            true
+          )
+          await exClient.deposit(
+            deployConfig.assets.WETH,
+            TOKEN_AMOUNT_ETHER,
+            true
+          )
 
-        await exClient.deposit(
-          deployConfig.assets.OAX,
-          TOKEN_AMOUNT_ETHER,
-          true
-        )
-        await exClient.deposit(
-          deployConfig.assets.WETH,
-          TOKEN_AMOUNT_ETHER,
-          true
-        )
-
-        clients.push(client)
-        console.info(`Created a new client ${l2Client.address}`)
+          clients.push(client)
+          console.info(`Created a new client ${l2Client.address}`)
+        } catch (e) {
+          console.error('Problem when trying to create client... ' + e)
+        }
       }
     }
   })
