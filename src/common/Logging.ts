@@ -6,7 +6,7 @@
 
 import fs from 'fs'
 import winston from 'winston'
-import { DiscordWebHook } from '@oax/common/logging/DiscordWebHookTransport'
+import { DiscordWebHook } from './logging/DiscordWebHookTransport'
 import { DISCORD_WEBHOOK_URL } from '../../config/environment'
 
 if (process.env.NODE_ENV !== 'docker') {
