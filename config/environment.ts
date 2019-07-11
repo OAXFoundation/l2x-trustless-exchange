@@ -40,6 +40,7 @@ export const OPERATOR_WALLET_FILEPATH = process.env.OPERATOR_WALLET_FILEPATH
 export const DEPLOYER_WALLET_FILEPATH = process.env.DEPLOYER_WALLET_FILEPATH
 export const DEPLOYER_PASSWORD = process.env.DEPLOYER_PASSWORD
 export const ROUND_SIZE = parseInt(process.env.ROUND_SIZE || '32')
+export const MOCK_MEDIATOR = (process.env.MOCK_MEDIATOR == "true")?true:false
 
 
 function ensureConfigExist(configName: string) {

@@ -12,7 +12,8 @@ import { D, etherToD, toEthersBn } from '@oax/common/BigNumberUtils'
 import {
   DEPLOYER_PASSWORD,
   DEPLOYER_WALLET_FILEPATH,
-  GETH_RPC_URL
+  GETH_RPC_URL,
+  MOCK_MEDIATOR
 } from '../config/environment'
 const API_URL = 'http://127.0.0.1:8899'
 const MAX_NUMBER_OF_CLIENTS = 40
@@ -26,6 +27,7 @@ import {
 
 import { L2ClientChaos } from '../tests/libs/L2ClientForTest'
 import { loadWalletFromFile } from '../bin/utils'
+import { waitForMining } from '../src/common/ContractUtils'
 
 interface Client {
   l2Client: L2ClientChaos
@@ -45,6 +47,9 @@ const E = etherToD
 const BLOCK_TIME_MS = 5000
 const FUND_AMOUNT_ETHER = D('1000')
 const TOKEN_AMOUNT_ETHER = D('10')
+
+// After this round the mediator halts
+const ROUND_HALT: number = 2
 
 const ODDS: { [event: string]: number } = {
   NEW_CLIENT: 0.75,
@@ -152,17 +157,19 @@ async function main() {
     return { l2Client, exClient }
   }
 
+  const mediatorContractName = MOCK_MEDIATOR?"MediatorMock":"Mediator"
+
   const mediator = getContract(
     deployConfig.mediator,
-    'Mediator',
+    mediatorContractName,
     deployerSigner
   )
 
   // @ts-ignore
   const BLOCKS_PER_ROUND = (await mediator.roundSize()).toNumber()
 
-  let round = (await mediator.getCurrentRound()).toNumber()
-  let quarter = (await mediator.getCurrentQuarter()).toNumber()
+  let round: number = (await mediator.getCurrentRound()).toNumber()
+  let quarter: number = (await mediator.getCurrentQuarter()).toNumber()
 
   let numberOfClients: number = 0
 
@@ -172,6 +179,25 @@ async function main() {
 
     if (r !== round) {
       round = r
+
+      console.log(
+        `\n\n\n******************** New round ${round} ***************************`
+      )
+
+      if (round === ROUND_HALT) {
+        console.log(`Halting the mediator...`)
+        await waitForMining(mediator.functions.halt())
+
+        for (const client of clients) {
+          const l2Client = client.l2Client
+
+          console.info(`Client ${l2Client.address} recovering WETH...`)
+          await l2Client.recoverFunds(deployConfig.assets.WETH)
+
+          console.info(`Client ${l2Client.address} recovering OAX...`)
+          await l2Client.recoverFunds(deployConfig.assets.OAX)
+        }
+      }
     }
 
     if (q !== quarter) {
@@ -266,6 +292,8 @@ async function main() {
   console.log('CHANCE OF EVENTS')
   console.log('================')
   console.log(ODDS)
+
+  console.log(`ROUND_HALT: ${ROUND_HALT}`)
 }
 
 main().catch(console.error)

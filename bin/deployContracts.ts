@@ -20,7 +20,8 @@ import {
   OPERATOR_WALLET_FILEPATH,
   ROUND_SIZE,
   GAS_PRICE,
-  GAS_LIMIT
+  GAS_LIMIT,
+  MOCK_MEDIATOR
 } from '../config/environment'
 import { loadWalletFromFile } from './utils'
 
@@ -90,7 +91,8 @@ async function run() {
   const mediatorContractAddress = await deployMediator(
     operatorAddress,
     ROUND_SIZE,
-    deployerSigner
+    deployerSigner,
+    MOCK_MEDIATOR
   )
 
   const mediatorContract = await loadContract(
@@ -162,9 +164,16 @@ async function deployToken(
 async function deployMediator(
   operatorAddress: Address,
   roundSize: number,
-  signer: JsonRpcSigner
+  signer: JsonRpcSigner,
+  mock = false
 ) {
-  const factory = getContractFactory('Mediator', signer)
+  let factory: any
+
+  if (mock) {
+    factory = getContractFactory('MediatorMock', signer)
+  } else {
+    factory = getContractFactory('Mediator', signer)
+  }
 
   console.log(
     `Deploying mediator for operator ${operatorAddress}, ${roundSize}-block rounds.`
