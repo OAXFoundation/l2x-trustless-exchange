@@ -14,7 +14,7 @@ cp README.md build/client/
 cp -r build/dist/src/common/ build/
 
 mkdir -p build/common/build/contracts
-cp -r build/contracts/{Mediator.abi,ERC20.abi} build/common/build/contracts/
+cp -r build/contracts/{Mediator.abi,ERC20.abi,MediatorMockChaos.abi} build/common/build/contracts/
 touch build/common/.contract_build_root
 
 mkdir -p build/common/src/contracts

@@ -5,11 +5,13 @@ build/
 pnpm-debug.log
 src/contracts/wrappers/
 coverage/
-.env
+.env*
 logs/
 .DS_Store
 storage
 deploy.json
+config.json
+wallet.bin
 
 UTC--2*
 *.sqlite

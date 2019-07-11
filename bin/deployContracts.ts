@@ -170,7 +170,7 @@ async function deployMediator(
   let factory: any
 
   if (mock) {
-    factory = getContractFactory('MediatorMock', signer)
+    factory = getContractFactory('MediatorMockChaos', signer)
   } else {
     factory = getContractFactory('Mediator', signer)
   }

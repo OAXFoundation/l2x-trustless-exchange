@@ -157,7 +157,7 @@ async function main() {
     return { l2Client, exClient }
   }
 
-  const mediatorContractName = MOCK_MEDIATOR ? 'MediatorMock' : 'Mediator'
+  const mediatorContractName = MOCK_MEDIATOR ? 'MediatorMockChaos' : 'Mediator'
 
   const mediator = getContract(
     deployConfig.mediator,

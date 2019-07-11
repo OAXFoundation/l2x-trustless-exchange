@@ -8,6 +8,7 @@ contract_names := \
 	Mediator \
 	MediatorMock \
 	MediatorMockNoTime \
+	MediatorMockChaos \
 	ERC20 \
 	Struct
 
@@ -49,6 +50,10 @@ ${contract_output_dir}:
 
 ${wrappers_dir}:
 	mkdir -p $@
+
+
+${solidity_dir}/MediatorMockChaos.sol: ${solidity_dir}/Mediator.sol
+	touch $@
 
 ${solidity_dir}/MediatorMock.sol: ${solidity_dir}/Mediator.sol
 	touch $@

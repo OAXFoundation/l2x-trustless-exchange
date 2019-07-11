@@ -42,7 +42,6 @@ export const DEPLOYER_PASSWORD = process.env.DEPLOYER_PASSWORD
 export const ROUND_SIZE = parseInt(process.env.ROUND_SIZE || '32')
 export const MOCK_MEDIATOR = process.env.MOCK_MEDIATOR == 'true' ? true : false
 
-
 function ensureConfigExist(configName: string) {
   if (process.env[configName] === undefined) {
     const msg = `Mandatory environment variable ${configName} is missing`
