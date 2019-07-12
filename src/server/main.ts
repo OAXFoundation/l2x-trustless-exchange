@@ -10,8 +10,8 @@ import { providers, Wallet, utils as EthersUtils } from 'ethers'
 import { HTTPServer } from './HTTPServer'
 import {
   GETH_RPC_URL,
-  WALLET_FILEPATH,
-  WALLET_PASSWORD,
+  OPERATOR_WALLET_FILEPATH,
+  OPERATOR_WALLET_PASSWORD,
   WALLET_ADDRESS,
   CONTRACTS,
   STORAGE_DIR,
@@ -61,9 +61,17 @@ async function main(): Promise<void> {
   // Load encrypted wallet from disk
   let signer = null
   let identity = null
-  if (WALLET_FILEPATH !== undefined && WALLET_PASSWORD !== undefined) {
-    logger.info(`Loading operator wallet from disk at ${WALLET_FILEPATH}...`)
-    const wallet = await loadEncryptedWallet(WALLET_FILEPATH, WALLET_PASSWORD)
+  if (
+    OPERATOR_WALLET_FILEPATH !== undefined &&
+    OPERATOR_WALLET_PASSWORD !== undefined
+  ) {
+    logger.info(
+      `Loading operator wallet from disk at ${OPERATOR_WALLET_FILEPATH}...`
+    )
+    const wallet = await loadEncryptedWallet(
+      OPERATOR_WALLET_FILEPATH,
+      OPERATOR_WALLET_PASSWORD
+    )
     signer = wallet.connect(provider)
     identity = new PrivateKeyIdentity(wallet.privateKey, provider)
   } else if (WALLET_ADDRESS !== undefined) {
@@ -72,7 +80,7 @@ async function main(): Promise<void> {
     identity = new JsonRPCIdentity(provider, WALLET_ADDRESS)
   } else {
     throw Error(
-      'WALLET_FILEPATH and WALLET_PASSWORD both need to be defined in environment.'
+      'OPERATOR_WALLET_FILEPATH and OPERATOR_WALLET_PASSWORD both need to be defined in environment.'
     )
   }
 
