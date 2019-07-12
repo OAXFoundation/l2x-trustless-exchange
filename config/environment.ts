@@ -41,8 +41,11 @@ export const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL
 export const OPERATOR_WALLET_FILEPATH = process.env.OPERATOR_WALLET_FILEPATH
 export const DEPLOYMENT_WALLET_FILEPATH = process.env.DEPLOYMENT_WALLET_FILEPATH
 export const DEPLOYMENT_WALLET_PASSWORD = process.env.DEPLOYMENT_WALLET_PASSWORD
-export const DEPLOYMENT_ROUND_SIZE = parseInt(process.env.DEPLOYMENT_ROUND_SIZE || '32')
-export const DEPLOYMENT_MOCK_MEDIATOR = process.env.DEPLOYMENT_MOCK_MEDIATOR == 'true' ? true : false
+export const DEPLOYMENT_ROUND_SIZE = parseInt(
+  process.env.DEPLOYMENT_ROUND_SIZE || '32'
+)
+export const DEPLOYMENT_MOCK_MEDIATOR =
+  process.env.DEPLOYMENT_MOCK_MEDIATOR == 'true' ? true : false
 
 function ensureConfigExist(configName: string) {
   if (process.env[configName] === undefined) {

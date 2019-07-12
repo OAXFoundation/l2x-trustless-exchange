@@ -104,7 +104,9 @@ async function main() {
 
   const deployConfig = JSON.parse(fs.readFileSync('deploy.json').toString())
 
-  const mediatorContractName = DEPLOYMENT_MOCK_MEDIATOR ? 'MediatorMockChaos' : 'Mediator'
+  const mediatorContractName = DEPLOYMENT_MOCK_MEDIATOR
+    ? 'MediatorMockChaos'
+    : 'Mediator'
 
   const mediator = getContract(
     deployConfig.mediator,
