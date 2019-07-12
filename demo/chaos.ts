@@ -16,8 +16,6 @@ import {
   DEPLOYMENT_MOCK_MEDIATOR,
   RUN_ON_LOCALHOST
 } from '../config/environment'
-const API_URL = 'http://127.0.0.1:8899'
-const MAX_NUMBER_OF_CLIENTS = 40
 
 import {
   AssetRegistry,
@@ -45,13 +43,18 @@ let clients: Client[] = []
 
 const E = etherToD
 
-// @ts-ignore
-const BLOCK_TIME_MS = 5000
-const FUND_AMOUNT_ETHER = D('1000')
-const TOKEN_AMOUNT_ETHER = D('10')
+////////////////////////////////////////////////
+// Chaos testing configuration
+////////////////////////////////////////////////
+
+const API_URL = 'http://127.0.0.1:8899'
+const MAX_NUMBER_OF_CLIENTS = 5
+
+const FUND_AMOUNT_ETHER = D('0.3')
+const TOKEN_AMOUNT_ETHER = D('0.1')
 
 // After this round the mediator halts
-const ROUND_HALT: number = 50
+const ROUND_HALT: number = 30
 
 const ODDS: { [event: string]: number } = {
   NEW_CLIENT: 0.75,
@@ -63,6 +66,9 @@ const ODDS: { [event: string]: number } = {
   BUY: 0.5,
   FAILURE: 0.05
 }
+const MAX_WITHDRAWAL_WEI = 500000000000000000
+
+////////////////////////////////////////////////
 
 function eventShouldOccur(eventName: string): boolean {
   if (ODDS[eventName] === undefined) throw Error('Unknown chance')
@@ -289,7 +295,7 @@ async function main() {
         }
 
         const randomWithdrawAmount = D(
-          Math.floor(Math.random() * 5000000000000000000).toString(10)
+          Math.floor(Math.random() * MAX_WITHDRAWAL_WEI).toString(10)
         )
         console.log(
           `Client ${

@@ -38,7 +38,10 @@ let server: HTTPServer | null = null
 let persistence: knex | null = null
 
 async function main(): Promise<void> {
+  logger.info('****************************************')
   logger.info('Starting...')
+  logger.info(`Ethereum network: ${GETH_RPC_URL}.`)
+  logger.info('****************************************')
 
   process.on('SIGINT', () => {
     gracefulShutdown().catch(e => {

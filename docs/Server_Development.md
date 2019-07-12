@@ -87,11 +87,36 @@ Wait until you see operator logs, then run
     
 #### Chaos testing
 
+##### Locally
+
 ```
     > runChaosGeth.sh
     > pnpm run start
     > ts-node demo/chaos.ts 
 ```
+
+##### On testnet 
+
+Define the environment in order to connect to Ropsten for example.
+
+```
+> cp .env.ropsten.example .env
+```
+
+Deploy the contracts on Ropsten
+
+
+Run the server (also deploys the contracts)
+```
+> pnpm start
+```
+
+Run the chaos tests
+```
+> pnpm test
+```
+
+
     
 If you want to just run the server with docker do 
 (be sure the server of for the tests above is not running anymore):
