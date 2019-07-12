@@ -48,6 +48,10 @@ export const DEPLOYMENT_ROUND_SIZE = parseInt(
 export const DEPLOYMENT_MOCK_MEDIATOR =
   process.env.DEPLOYMENT_MOCK_MEDIATOR == 'true' ? true : false
 
+export const RUN_ON_LOCALHOST: boolean =
+  GETH_RPC_URL.indexOf('127.0.0.1') >= 0 ||
+  GETH_RPC_URL.indexOf('localhost') >= 0
+
 function ensureConfigExist(configName: string) {
   if (process.env[configName] === undefined) {
     const msg = `Mandatory environment variable ${configName} is missing`

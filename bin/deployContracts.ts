@@ -21,7 +21,8 @@ import {
   DEPLOYMENT_ROUND_SIZE,
   DEPLOYMENT_GAS_PRICE,
   DEPLOYMENT_GAS_LIMIT,
-  DEPLOYMENT_MOCK_MEDIATOR
+  DEPLOYMENT_MOCK_MEDIATOR,
+  RUN_ON_LOCALHOST
 } from '../config/environment'
 import { loadWalletFromFile } from './utils'
 
@@ -48,7 +49,7 @@ async function run() {
   let deployerSigner = null
   let operatorSigner = null
 
-  if (process.argv.length > 2 && process.argv[2] == '--UseTestWallets') {
+  if (RUN_ON_LOCALHOST) {
     console.log('Loading test wallets from geth...')
 
     deployerSigner = provider.getSigner(1)

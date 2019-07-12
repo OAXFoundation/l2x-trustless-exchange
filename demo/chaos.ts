@@ -13,7 +13,8 @@ import {
   DEPLOYMENT_WALLET_PASSWORD,
   DEPLOYMENT_WALLET_FILEPATH,
   GETH_RPC_URL,
-  DEPLOYMENT_MOCK_MEDIATOR
+  DEPLOYMENT_MOCK_MEDIATOR,
+  RUN_ON_LOCALHOST
 } from '../config/environment'
 const API_URL = 'http://127.0.0.1:8899'
 const MAX_NUMBER_OF_CLIENTS = 40
@@ -73,18 +74,12 @@ function eventShouldOccur(eventName: string): boolean {
  */
 
 async function getDeployerSigner(): Promise<JsonRpcSigner> {
-  const providerUrl = GETH_RPC_URL
   console.log(`GETH_RPC_URL: ${GETH_RPC_URL}`)
 
   let deployerSigner: JsonRpcSigner
 
-  const runsOnLocalhost: boolean =
-    providerUrl.indexOf('127.0.0.1') >= 0 ||
-    providerUrl.indexOf('localhost') >= 0
-
   // Fetch local signer
-
-  if (runsOnLocalhost) {
+  if (RUN_ON_LOCALHOST) {
     deployerSigner = await provider.getSigner(1)
   } else {
     // Fetch testnet signer
