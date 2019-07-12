@@ -48,7 +48,7 @@ const E = etherToD
 ////////////////////////////////////////////////
 
 const API_URL = 'http://127.0.0.1:8899'
-const MAX_NUMBER_OF_CLIENTS = 5
+const MAX_NUMBER_OF_CLIENTS = 10
 
 const FUND_AMOUNT_ETHER = D('0.3')
 const TOKEN_AMOUNT_ETHER = D('0.1')
@@ -66,7 +66,8 @@ const ODDS: { [event: string]: number } = {
   BUY: 0.5,
   FAILURE: 0.05
 }
-const MAX_WITHDRAWAL_WEI = 500000000000000000
+const MAX_WITHDRAWAL_WEI = 5000000000000000
+const MAX_ORDER_AMOUNT_ETH = D('0.1')
 
 ////////////////////////////////////////////////
 
@@ -222,9 +223,6 @@ async function main() {
     }
   }
 
-  // @ts-ignore
-  const BLOCKS_PER_ROUND = (await mediator.roundSize()).toNumber()
-
   let round: number = (await mediator.getCurrentRound()).toNumber()
   let quarter: number = (await mediator.getCurrentQuarter()).toNumber()
 
@@ -272,6 +270,8 @@ async function main() {
         const orderType = 'limit'
         const orderSide = eventShouldOccur('BUY') ? 'buy' : 'sell'
         const orderAmt = D(new BigNumber(Math.random()).toString(10))
+          .multipliedBy(MAX_ORDER_AMOUNT_ETH)
+          .decimalPlaces(8)
         const orderPrice = D('1')
 
         console.info(`Client ${l2Client.address} placing order.
