@@ -31,16 +31,18 @@ export const WALLET_ADDRESS = process.env.WALLET_ADDRESS
 export const WALLET_FILEPATH = process.env.WALLET_FILEPATH
 export const WALLET_PASSWORD = process.env.WALLET_PASSWORD
 
-export const GAS_LIMIT = Number(process.env.GAS_LIMIT || '6800000')
-export const GAS_PRICE = parseInt(process.env.GAS_PRICE || '10000000000')
+export const DEPLOYMENT_GAS_LIMIT = Number(process.env.GAS_LIMIT || '6800000')
+export const DEPLOYMENT_GAS_PRICE = parseInt(
+  process.env.GAS_PRICE || '10000000000'
+)
 
 export const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL
 
 export const OPERATOR_WALLET_FILEPATH = process.env.OPERATOR_WALLET_FILEPATH
-export const DEPLOYER_WALLET_FILEPATH = process.env.DEPLOYER_WALLET_FILEPATH
-export const DEPLOYER_PASSWORD = process.env.DEPLOYER_PASSWORD
-export const ROUND_SIZE = parseInt(process.env.ROUND_SIZE || '32')
-export const MOCK_MEDIATOR = process.env.MOCK_MEDIATOR == 'true' ? true : false
+export const DEPLOYMENT_WALLET_FILEPATH = process.env.DEPLOYMENT_WALLET_FILEPATH
+export const DEPLOYMENT_WALLET_PASSWORD = process.env.DEPLOYMENT_WALLET_PASSWORD
+export const DEPLOYMENT_ROUND_SIZE = parseInt(process.env.DEPLOYMENT_ROUND_SIZE || '32')
+export const DEPLOYMENT_MOCK_MEDIATOR = process.env.DEPLOYMENT_MOCK_MEDIATOR == 'true' ? true : false
 
 function ensureConfigExist(configName: string) {
   if (process.env[configName] === undefined) {

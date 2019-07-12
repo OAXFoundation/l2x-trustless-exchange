@@ -10,10 +10,10 @@ import { JsonRpcProvider, JsonRpcSigner } from 'ethers/providers'
 import { D, etherToD, toEthersBn } from '@oax/common/BigNumberUtils'
 
 import {
-  DEPLOYER_PASSWORD,
-  DEPLOYER_WALLET_FILEPATH,
+  DEPLOYMENT_WALLET_PASSWORD,
+  DEPLOYMENT_WALLET_FILEPATH,
   GETH_RPC_URL,
-  MOCK_MEDIATOR
+  DEPLOYMENT_MOCK_MEDIATOR
 } from '../config/environment'
 const API_URL = 'http://127.0.0.1:8899'
 const MAX_NUMBER_OF_CLIENTS = 40
@@ -50,7 +50,7 @@ const FUND_AMOUNT_ETHER = D('1000')
 const TOKEN_AMOUNT_ETHER = D('10')
 
 // After this round the mediator halts
-const ROUND_HALT: number = 3
+const ROUND_HALT: number = 50
 
 const ODDS: { [event: string]: number } = {
   NEW_CLIENT: 0.75,
@@ -90,8 +90,8 @@ async function getDeployerSigner(): Promise<JsonRpcSigner> {
     // Fetch testnet signer
 
     let deployerWallet = await loadWalletFromFile(
-      DEPLOYER_WALLET_FILEPATH!,
-      DEPLOYER_PASSWORD
+      DEPLOYMENT_WALLET_FILEPATH!,
+      DEPLOYMENT_WALLET_PASSWORD
     )
     deployerSigner = await deployerWallet.connect(provider)
   }
@@ -104,7 +104,7 @@ async function main() {
 
   const deployConfig = JSON.parse(fs.readFileSync('deploy.json').toString())
 
-  const mediatorContractName = MOCK_MEDIATOR ? 'MediatorMockChaos' : 'Mediator'
+  const mediatorContractName = DEPLOYMENT_MOCK_MEDIATOR ? 'MediatorMockChaos' : 'Mediator'
 
   const mediator = getContract(
     deployConfig.mediator,

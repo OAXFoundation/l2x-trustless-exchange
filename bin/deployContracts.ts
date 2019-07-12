@@ -15,13 +15,13 @@ const Ethers = require('ethers')
 
 import {
   GETH_RPC_URL,
-  DEPLOYER_WALLET_FILEPATH,
-  DEPLOYER_PASSWORD,
+  DEPLOYMENT_WALLET_FILEPATH,
+  DEPLOYMENT_WALLET_PASSWORD,
   OPERATOR_WALLET_FILEPATH,
-  ROUND_SIZE,
-  GAS_PRICE,
-  GAS_LIMIT,
-  MOCK_MEDIATOR
+  DEPLOYMENT_ROUND_SIZE,
+  DEPLOYMENT_GAS_PRICE,
+  DEPLOYMENT_GAS_LIMIT,
+  DEPLOYMENT_MOCK_MEDIATOR
 } from '../config/environment'
 import { loadWalletFromFile } from './utils'
 
@@ -31,16 +31,16 @@ async function run() {
   const provider = new Ethers.providers.JsonRpcProvider(GETH_RPC_URL)
 
   console.log(`Deploying at ${GETH_RPC_URL}`)
-  console.log(`Gas limit: ${GAS_LIMIT}`)
-  console.log(`Gas price: ${GAS_PRICE}`)
+  console.log(`Gas limit: ${DEPLOYMENT_GAS_LIMIT}`)
+  console.log(`Gas price: ${DEPLOYMENT_GAS_PRICE}`)
 
   let transactionOptions: any
 
-  if (GAS_PRICE === 0) {
+  if (DEPLOYMENT_GAS_PRICE === 0) {
     transactionOptions = {}
   } else {
     transactionOptions = {
-      gasPrice: GAS_PRICE
+      gasPrice: DEPLOYMENT_GAS_PRICE
     }
   }
 
@@ -56,8 +56,8 @@ async function run() {
   } else {
     console.log('Loading wallets from disk...')
     const deployerWallet = await loadWalletFromFile(
-      DEPLOYER_WALLET_FILEPATH!,
-      DEPLOYER_PASSWORD
+      DEPLOYMENT_WALLET_FILEPATH!,
+      DEPLOYMENT_WALLET_PASSWORD
     )
 
     const operatorWallet = await loadWalletFromFile(OPERATOR_WALLET_FILEPATH!)
@@ -90,9 +90,9 @@ async function run() {
   // Deploy the mediator contract
   const mediatorContractAddress = await deployMediator(
     operatorAddress,
-    ROUND_SIZE,
+    DEPLOYMENT_ROUND_SIZE,
     deployerSigner,
-    MOCK_MEDIATOR
+    DEPLOYMENT_MOCK_MEDIATOR
   )
 
   const mediatorContract = await loadContract(
@@ -143,9 +143,9 @@ async function deployToken(
 
   console.log(`Deploying token ${name}.`)
   const tx = factory.getDeployTransaction()
-  if (GAS_PRICE !== 0) {
-    tx.gasLimit = GAS_LIMIT
-    tx.gasPrice = GAS_PRICE
+  if (DEPLOYMENT_GAS_PRICE !== 0) {
+    tx.gasLimit = DEPLOYMENT_GAS_LIMIT
+    tx.gasPrice = DEPLOYMENT_GAS_PRICE
   }
 
   const txSentPromise = signer.sendTransaction(tx)
@@ -180,9 +180,9 @@ async function deployMediator(
   )
   let tx = factory.getDeployTransaction(roundSize, operatorAddress)
 
-  if (GAS_PRICE !== 0) {
-    tx.gasLimit = GAS_LIMIT
-    tx.gasPrice = GAS_PRICE
+  if (DEPLOYMENT_GAS_PRICE !== 0) {
+    tx.gasLimit = DEPLOYMENT_GAS_LIMIT
+    tx.gasPrice = DEPLOYMENT_GAS_PRICE
   }
 
   const txSentPromise = signer.sendTransaction(tx)
