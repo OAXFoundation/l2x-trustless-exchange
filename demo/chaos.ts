@@ -188,7 +188,7 @@ async function main() {
     try {
       await l2client.deposit(tokenAddress, D('10'), true)
     } catch (e) {
-      console.info('This exception is expected.')
+      console.info('This exception is expected. Deposit has been blocked')
     }
 
     currentRound = await l2client.mediator.getCurrentRound()
@@ -202,6 +202,37 @@ async function main() {
       console.log(`Amount before: ${amountBefore}`)
       console.log(`Amount after: ${amountAfter}`)
       const msg = 'The deposit was accepted despite the mediator is HALTED!'
+      console.error(msg)
+    }
+  }
+
+  async function checkInitiateWithdrawalBlocked(
+    l2client: L2ClientChaos,
+    tokenAddress: Address
+  ) {
+    let currentRound = await l2client.mediator.getCurrentRound()
+    const amountBefore = await l2client.getBalanceTokenOffChain(
+      tokenAddress,
+      currentRound
+    )
+
+    try {
+      await l2client.withdraw(tokenAddress, D('10'))
+    } catch (e) {
+      console.info('This exception is expected. Withdrawal has been blocked.')
+    }
+
+    currentRound = await l2client.mediator.getCurrentRound()
+
+    const amountAfter = await l2client.getBalanceTokenOffChain(
+      tokenAddress,
+      currentRound
+    )
+
+    if (!amountAfter.minus(amountBefore).eq(D('0'))) {
+      console.log(`Amount before: ${amountBefore}`)
+      console.log(`Amount after: ${amountAfter}`)
+      const msg = 'The withdrawal was executed despite the mediator is HALTED!'
       console.error(msg)
     }
   }
@@ -303,6 +334,22 @@ async function main() {
           } catch (e) {
             console.error(
               'Something went wrong when trying to deposit in HALTED mode: ' + e
+            )
+          }
+
+          try {
+            await checkInitiateWithdrawalBlocked(
+              l2Client,
+              deployConfig.assets.OAX
+            )
+            await checkInitiateWithdrawalBlocked(
+              l2Client,
+              deployConfig.assets.WETH
+            )
+          } catch (e) {
+            console.error(
+              'Something went wrong when trying to withdraw in HALTED mode: ' +
+                e
             )
           }
         }
