@@ -54,7 +54,7 @@ const FUND_AMOUNT_ETHER = D('0.3')
 const TOKEN_AMOUNT_ETHER = D('0.1')
 
 // After this round the mediator halts
-const ROUND_HALT: number = 30
+const ROUND_HALT: number = 4
 
 const ODDS: { [event: string]: number } = {
   NEW_CLIENT: 0.75,
@@ -170,6 +170,47 @@ async function main() {
     return { l2Client, exClient }
   }
 
+  /**
+   * Check that a client cannot deposit once the mediator enters in halted mode
+   * @param l2client: client to be tested
+   * @param tokenAddress: tokenAddress used for the deposit attempt
+   */
+  async function checkDepositBlocked(
+    l2client: L2ClientChaos,
+    tokenAddress: Address
+  ) {
+    let currentRound = await l2client.mediator.getCurrentRound()
+    const amountBefore = await l2client.getBalanceTokenOffChain(
+      tokenAddress,
+      currentRound
+    )
+
+    try {
+      await l2client.deposit(tokenAddress, D('10'), true)
+    } catch (e) {
+      console.info('This exception is expected.')
+    }
+
+    currentRound = await l2client.mediator.getCurrentRound()
+
+    const amountAfter = await l2client.getBalanceTokenOffChain(
+      tokenAddress,
+      currentRound
+    )
+
+    if (!amountAfter.minus(amountBefore).eq(D('0'))) {
+      console.log(`Amount before: ${amountBefore}`)
+      console.log(`Amount after: ${amountAfter}`)
+      const msg = 'The deposit was accepted despite the mediator is HALTED!'
+      console.error(msg)
+    }
+  }
+
+  /**
+   * Check that a client can recover their funds once the mediator is halted
+   * @param l2Client
+   * @param tokenAddress
+   */
   async function checkFundsRecovery(
     l2Client: L2ClientChaos,
     tokenAddress: Address
@@ -254,6 +295,15 @@ async function main() {
             await checkFundsRecovery(l2Client, deployConfig.assets.WETH)
           } catch (e) {
             console.error('Error when trying to recover funds... ' + e)
+          }
+
+          try {
+            await checkDepositBlocked(l2Client, deployConfig.assets.OAX)
+            await checkDepositBlocked(l2Client, deployConfig.assets.WETH)
+          } catch (e) {
+            console.error(
+              'Something went wrong when trying to deposit in HALTED mode: ' + e
+            )
           }
         }
       }

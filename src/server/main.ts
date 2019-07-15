@@ -72,8 +72,8 @@ async function main(): Promise<void> {
       `Loading operator wallet from disk at ${OPERATOR_WALLET_FILEPATH}...`
     )
     const wallet = await loadEncryptedWallet(
-      OPERATOR_WALLET_FILEPATH,
-      OPERATOR_WALLET_PASSWORD
+      OPERATOR_WALLET_FILEPATH!,
+      OPERATOR_WALLET_PASSWORD!
     )
     signer = wallet.connect(provider)
     identity = new PrivateKeyIdentity(wallet.privateKey, provider)
