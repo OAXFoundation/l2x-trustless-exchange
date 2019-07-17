@@ -9,6 +9,7 @@
 import 'jest'
 import { orderFixtures } from './libs/fixtures/Order.fixture'
 import { marketDepth, orderToBidAsk } from '../src/server/exchange/OrderBook'
+import { D } from '@oax/common/BigNumberUtils'
 
 describe('IOrderBook', () => {
   // sorted best (highest price) to worst (lowest price)
@@ -16,6 +17,20 @@ describe('IOrderBook', () => {
 
   // sorted best (lowest price) to worst (highest price)
   const asks = orderFixtures.asks
+
+  // for price level filtering
+  const filledBid = {
+    ...bids[0],
+    price: bids[0].price.times(2),
+    remaining: D('0')
+  }
+
+  // for price level filtering
+  const filledAsk = {
+    ...asks[0],
+    price: asks[0].price.times(2),
+    remaining: D('0')
+  }
 
   // put the bids and asks in the wrong order
   const orders = [...bids.slice(0).reverse(), ...asks.slice(0).reverse()]
@@ -41,6 +56,17 @@ describe('IOrderBook', () => {
         bids: []
       })
     })
+
+    it('filters out price level with 0 amount', () => {
+      const level = marketDepth('L3', [...orders, filledAsk, filledBid], {
+        decimalPlaces: 1
+      })
+
+      expect(level).toEqual({
+        bids: orderFixtures.orderBookLevel3Dp1.bids,
+        asks: orderFixtures.orderBookLevel3Dp1.asks
+      })
+    })
   })
 
   describe('level 2', () => {
@@ -61,6 +87,17 @@ describe('IOrderBook', () => {
       expect(level).toEqual({
         asks: [],
         bids: []
+      })
+    })
+
+    it('filters out price level with 0 amount', () => {
+      const level = marketDepth('L2', [...orders, filledAsk, filledBid], {
+        decimalPlaces: 1
+      })
+
+      expect(level).toEqual({
+        bids: orderFixtures.orderBookLevel2Dp1.bids,
+        asks: orderFixtures.orderBookLevel2Dp1.asks
       })
     })
   })
@@ -84,6 +121,17 @@ describe('IOrderBook', () => {
       expect(level).toEqual({
         asks: [],
         bids: []
+      })
+    })
+
+    it('filters out price level with 0 amount', () => {
+      const level = marketDepth('L1', [...orders, filledAsk, filledBid], {
+        decimalPlaces: 1
+      })
+
+      expect(level).toEqual({
+        bids: orderFixtures.orderBookLevel1Dp1.bids,
+        asks: orderFixtures.orderBookLevel1Dp1.asks
       })
     })
   })

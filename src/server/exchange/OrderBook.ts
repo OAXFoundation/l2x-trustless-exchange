@@ -77,8 +77,12 @@ function level3BidAsks(decimalPlaces: number, orders: IOrder[]): MarketDepth {
   }
 
   return {
-    bids: sortBids(bids).map(toBidAsk),
-    asks: sortAsks(asks).map(toBidAsk)
+    bids: sortBids(bids)
+      .map(toBidAsk)
+      .filter(o => !o.amount.eq(0)),
+    asks: sortAsks(asks)
+      .map(toBidAsk)
+      .filter(o => !o.amount.eq(0))
   }
 }
 
