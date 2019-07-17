@@ -184,9 +184,8 @@ async function main(): Promise<void> {
     signer,
     mediator,
     logger,
-    { gasLimit: DEPLOYMENT_GAS_LIMIT, gasPrice: DEPLOYMENT_GAS_PRICE}
+    { gasLimit: DEPLOYMENT_GAS_LIMIT, gasPrice: DEPLOYMENT_GAS_PRICE }
   )
-  
 
   const operator = new Operator(identity!, mediatorAsync, provider, metaLedger)
 

@@ -28,8 +28,6 @@ export const CONTRACTS: { [name: string]: string | undefined } = {
 export const FEE_AMOUNT_WEI = etherToWei(D(process.env.FEE_AMOUNT_ETHER!))
 
 export const WALLET_ADDRESS = process.env.WALLET_ADDRESS
-export const WALLET_FILEPATH = process.env.WALLET_FILEPATH
-export const WALLET_PASSWORD = process.env.WALLET_PASSWORD
 
 export const DEPLOYMENT_GAS_LIMIT = Number(process.env.GAS_LIMIT || '6800000')
 export const DEPLOYMENT_GAS_PRICE = parseInt(
