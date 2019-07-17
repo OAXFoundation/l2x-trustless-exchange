@@ -15,8 +15,8 @@ import {
   CONTRACTS,
   STORAGE_DIR,
   FEE_AMOUNT_WEI,
-  DEPLOYMENT_GAS_LIMIT,
-  DEPLOYMENT_GAS_PRICE,
+  GAS_LIMIT,
+  GAS_PRICE,
   RUN_ON_LOCALHOST,
   INDEX_OPERATOR_SIGNER_LOCAL
 } from '../../config/environment'
@@ -182,7 +182,7 @@ async function main(): Promise<void> {
     signer,
     mediator,
     logger,
-    { gasLimit: DEPLOYMENT_GAS_LIMIT, gasPrice: DEPLOYMENT_GAS_PRICE }
+    { gasLimit: GAS_LIMIT, gasPrice: GAS_PRICE }
   )
 
   const operator = new Operator(identity!, mediatorAsync, provider, metaLedger)

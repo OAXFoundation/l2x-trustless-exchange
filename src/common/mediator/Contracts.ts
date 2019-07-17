@@ -64,6 +64,11 @@ export class MediatorAsync implements IMediatorAsync {
     this.logger = logger
     this.gasLimit = gasLimit
     this.gasPrice = gasPrice
+
+    if (this.logger) {
+      this.logger.info(`Gas price for mediator: ${this.gasPrice}`)
+      this.logger.info(`Gas limit for mediator: ${this.gasLimit}`)
+    }
   }
 
   private async waitForMiningAndLog(

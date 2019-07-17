@@ -32,7 +32,7 @@ export const CONTRACTS: { [name: string]: string | undefined } = {
 }
 export const FEE_AMOUNT_WEI = etherToWei(D(process.env.FEE_AMOUNT_ETHER!))
 
-export const GAS_PRICE = parseInt(process.env.GAS_PRICE! )
+export const GAS_PRICE = parseInt(process.env.GAS_PRICE!)
 export const GAS_LIMIT = parseInt(process.env.GAS_LIMIT!)
 
 export const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL
@@ -49,18 +49,15 @@ export const RUN_ON_LOCALHOST: boolean =
 
 // Deployment
 
-export const DEPLOYMENT_GAS_LIMIT = parseInt(
-  process.env.DEPLOYMENT_GAS_LIMIT!
-)
-export const DEPLOYMENT_GAS_PRICE = parseInt(
-  process.env.DEPLOYMENT_GAS_PRICE!
-)
+export const DEPLOYMENT_GAS_LIMIT = parseInt(process.env.DEPLOYMENT_GAS_LIMIT!)
+export const DEPLOYMENT_GAS_PRICE = parseInt(process.env.DEPLOYMENT_GAS_PRICE!)
 
 export const DEPLOYMENT_WALLET_FILEPATH = process.env.DEPLOYMENT_WALLET_FILEPATH
 export const DEPLOYMENT_WALLET_PASSWORD = process.env.DEPLOYMENT_WALLET_PASSWORD
 export const DEPLOYMENT_ROUND_SIZE = parseInt(
   process.env.DEPLOYMENT_ROUND_SIZE!
 )
+
 export const DEPLOYMENT_MOCK_MEDIATOR =
   process.env.DEPLOYMENT_MOCK_MEDIATOR == 'true' ? true : false
 
