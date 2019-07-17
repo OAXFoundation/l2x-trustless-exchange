@@ -14,7 +14,8 @@ import {
   DEPLOYMENT_WALLET_FILEPATH,
   GETH_RPC_URL,
   DEPLOYMENT_MOCK_MEDIATOR,
-  RUN_ON_LOCALHOST
+  RUN_ON_LOCALHOST,
+  OPERATOR_HTTP_PORT
 } from '../config/environment'
 
 import {
@@ -47,7 +48,7 @@ const E = etherToD
 // Chaos testing configuration
 ////////////////////////////////////////////////
 
-const API_URL = 'http://127.0.0.1:8899'
+const API_URL = `http://127.0.0.1:${OPERATOR_HTTP_PORT}`
 const MAX_NUMBER_OF_CLIENTS = 10
 
 const FUND_AMOUNT_ETHER = D('0.3')

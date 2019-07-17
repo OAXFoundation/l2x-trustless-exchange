@@ -18,7 +18,8 @@ import {
   GAS_LIMIT,
   GAS_PRICE,
   RUN_ON_LOCALHOST,
-  INDEX_OPERATOR_SIGNER_LOCAL
+  INDEX_OPERATOR_SIGNER_LOCAL,
+  OPERATOR_HTTP_PORT
 } from '../../config/environment'
 import { loggers } from '../common/Logging'
 import fs from 'fs'
@@ -33,7 +34,7 @@ import { JsonRPCIdentity } from '../../src/common/identity/jsonRPCIdentity'
 
 // Globals
 const logger = loggers.get('backend')
-const options = { port: 8899 }
+const options = { port: OPERATOR_HTTP_PORT }
 
 let server: HTTPServer | null = null
 let persistence: knex | null = null
@@ -42,6 +43,7 @@ async function main(): Promise<void> {
   logger.info('****************************************')
   logger.info('Starting...')
   logger.info(`Ethereum network: ${GETH_RPC_URL}.`)
+  logger.info(`Server running on port ${OPERATOR_HTTP_PORT}.`)
   logger.info('****************************************')
 
   process.on('SIGINT', () => {

@@ -13,7 +13,8 @@ import BigNumber from 'bignumber.js'
 import {
   GETH_RPC_URL,
   CONTRACTS,
-  FEE_AMOUNT_WEI
+  FEE_AMOUNT_WEI,
+  OPERATOR_HTTP_PORT
 } from '../../config/environment'
 import {
   Address,
@@ -43,7 +44,7 @@ function doServerSetupInTest() {
   return process.env.DOCKER_E2E == undefined
 }
 
-const SERVER_URL = 'http://127.0.0.1:8899'
+const SERVER_URL = `http://127.0.0.1:${OPERATOR_HTTP_PORT}`
 
 async function skipToNextRound(
   mediator: MediatorAsync,
