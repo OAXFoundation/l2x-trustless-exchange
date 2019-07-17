@@ -34,17 +34,19 @@ async function run() {
   const provider = new Ethers.providers.JsonRpcProvider(GETH_RPC_URL)
 
   console.log(`Deploying at ${GETH_RPC_URL}`)
-  console.log(`Gas limit: ${DEPLOYMENT_GAS_LIMIT}`)
-  console.log(`Gas price: ${DEPLOYMENT_GAS_PRICE}`)
 
   let transactionOptions: any
 
   if (DEPLOYMENT_GAS_PRICE === 0) {
     transactionOptions = {}
+    console.log('No gas price specified for deployment.')
   } else {
     transactionOptions = {
-      gasPrice: DEPLOYMENT_GAS_PRICE
+      gasPrice: DEPLOYMENT_GAS_PRICE,
+      gasLimit: DEPLOYMENT_GAS_LIMIT
     }
+    console.log(`Gas price for deployment:${transactionOptions.gasPrice}`)
+    console.log(`Gas limit for deployment: ${transactionOptions.gasLimit}`)
   }
 
   // Load wallets
@@ -74,7 +76,6 @@ async function run() {
 
   console.log(`Loaded deployer wallet with address ${deployerAddress}`)
   console.log(`Loaded operator wallet with address ${operatorAddress}`)
-  console.log('')
 
   // Deploy the token contracts
   const oaxContractAddress = await deployToken(
@@ -82,13 +83,12 @@ async function run() {
     'ETHToken',
     deployerSigner
   )
-  console.log('')
+
   const wethContractAddress = await deployToken(
     'ETHToken',
     'ETHToken',
     deployerSigner
   )
-  console.log('')
 
   // Deploy the mediator contract
   const mediatorContractAddress = await deployMediator(
@@ -103,7 +103,6 @@ async function run() {
     mediatorContractAddress!,
     operatorSigner
   )
-  console.log('')
 
   // Register assets
   console.log('Registering OAX token with Mediator...')
@@ -149,11 +148,20 @@ async function deployToken(
   if (DEPLOYMENT_GAS_PRICE !== 0) {
     tx.gasLimit = DEPLOYMENT_GAS_LIMIT
     tx.gasPrice = DEPLOYMENT_GAS_PRICE
+    console.log(
+      `Using gas configuration from environment. GAS_LIMIT=${
+        tx.gasLimit
+      }, GAS_PRICE=${tx.gasPrice}.`
+    )
   }
 
   const txSentPromise = signer.sendTransaction(tx)
   const txSent = await txSentPromise
-  console.log(`Sent tx with hash ${txSent.hash}. Waiting for mining...`)
+  console.log(
+    `Sent tx with hash ${txSent.hash}. GAS_LIMIT=${
+      txSent.gasLimit
+    }; GAS_PRICE=${txSent.gasPrice}. Waiting for mining...`
+  )
 
   const txReceipt = await waitForMining(txSentPromise)
 
@@ -186,13 +194,23 @@ async function deployMediator(
   if (DEPLOYMENT_GAS_PRICE !== 0) {
     tx.gasLimit = DEPLOYMENT_GAS_LIMIT
     tx.gasPrice = DEPLOYMENT_GAS_PRICE
+
+    console.log(
+      `Using gas configuration from environment. GAS_LIMIT=${
+        tx.gasLimit
+      }, GAS_PRICE=${tx.gasPrice}.`
+    )
   }
 
   const txSentPromise = signer.sendTransaction(tx)
   const txSent = await txSentPromise
 
   const txReceipt = await waitForMining(txSentPromise)
-  console.log(`Sent tx with hash ${txSent.hash}. Waiting for mining...`)
+  console.log(
+    `Sent tx with hash ${txSent.hash}. Gas used=${
+      txReceipt.gasUsed
+    }. Waiting for mining...`
+  )
 
   const contractAddress = txReceipt.contractAddress
 
