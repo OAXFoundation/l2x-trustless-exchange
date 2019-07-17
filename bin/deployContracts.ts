@@ -22,7 +22,9 @@ import {
   DEPLOYMENT_GAS_PRICE,
   DEPLOYMENT_GAS_LIMIT,
   DEPLOYMENT_MOCK_MEDIATOR,
-  RUN_ON_LOCALHOST
+  RUN_ON_LOCALHOST,
+  INDEX_DEPLOYER_SIGNER_LOCAL,
+  INDEX_OPERATOR_SIGNER_LOCAL
 } from '../config/environment'
 import { loadWalletFromFile } from './utils'
 
@@ -52,8 +54,8 @@ async function run() {
   if (RUN_ON_LOCALHOST) {
     console.log('Loading test wallets from geth...')
 
-    deployerSigner = provider.getSigner(1)
-    operatorSigner = provider.getSigner(2)
+    deployerSigner = provider.getSigner(INDEX_DEPLOYER_SIGNER_LOCAL)
+    operatorSigner = provider.getSigner(INDEX_OPERATOR_SIGNER_LOCAL)
   } else {
     console.log('Loading wallets from disk...')
     const deployerWallet = await loadWalletFromFile(

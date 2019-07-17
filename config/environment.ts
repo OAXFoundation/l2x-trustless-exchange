@@ -27,14 +27,15 @@ export const CONTRACTS: { [name: string]: string | undefined } = {
 }
 export const FEE_AMOUNT_WEI = etherToWei(D(process.env.FEE_AMOUNT_ETHER!))
 
-export const WALLET_ADDRESS = process.env.WALLET_ADDRESS
-
 export const DEPLOYMENT_GAS_LIMIT = Number(process.env.GAS_LIMIT || '6800000')
 export const DEPLOYMENT_GAS_PRICE = parseInt(
   process.env.GAS_PRICE || '10000000000'
 )
 
 export const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL
+
+export const INDEX_DEPLOYER_SIGNER_LOCAL = 1
+export const INDEX_OPERATOR_SIGNER_LOCAL = 2
 
 export const OPERATOR_WALLET_FILEPATH = process.env.OPERATOR_WALLET_FILEPATH
 export const OPERATOR_WALLET_PASSWORD = process.env.OPERATOR_WALLET_PASSWORD

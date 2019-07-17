@@ -12,12 +12,13 @@ import {
   GETH_RPC_URL,
   OPERATOR_WALLET_FILEPATH,
   OPERATOR_WALLET_PASSWORD,
-  WALLET_ADDRESS,
   CONTRACTS,
   STORAGE_DIR,
   FEE_AMOUNT_WEI,
   DEPLOYMENT_GAS_LIMIT,
-  DEPLOYMENT_GAS_PRICE
+  DEPLOYMENT_GAS_PRICE,
+  RUN_ON_LOCALHOST,
+  INDEX_OPERATOR_SIGNER_LOCAL
 } from '../../config/environment'
 import { loggers } from '../common/Logging'
 import fs from 'fs'
@@ -28,7 +29,7 @@ import { Exchange, ExchangeConfig } from './exchange/Exchange'
 import { Mediator } from '../contracts/wrappers/Mediator'
 import { MetaLedger } from '../common/accounting/MetaLedger'
 import { MediatorAsync } from '../common/mediator/Contracts'
-import { JsonRPCIdentity } from '../common/identity/jsonRPCIdentity'
+import { JsonRPCIdentity } from '../../src/common/identity/jsonRPCIdentity'
 
 // Globals
 const logger = loggers.get('backend')
@@ -64,10 +65,11 @@ async function main(): Promise<void> {
   // Load encrypted wallet from disk
   let signer = null
   let identity = null
-  if (
-    OPERATOR_WALLET_FILEPATH !== undefined &&
-    OPERATOR_WALLET_PASSWORD !== undefined
-  ) {
+  if (RUN_ON_LOCALHOST) {
+    logger.info(`Loading operator wallet from local ethereum node...`)
+    signer = provider.getSigner(INDEX_OPERATOR_SIGNER_LOCAL)
+    identity = new JsonRPCIdentity(provider, await signer.getAddress())
+  } else if (OPERATOR_WALLET_FILEPATH !== '') {
     logger.info(
       `Loading operator wallet from disk at ${OPERATOR_WALLET_FILEPATH}...`
     )
@@ -77,13 +79,9 @@ async function main(): Promise<void> {
     )
     signer = wallet.connect(provider)
     identity = new PrivateKeyIdentity(wallet.privateKey, provider)
-  } else if (WALLET_ADDRESS !== undefined) {
-    logger.info(`Loading operator wallet from running node...`)
-    signer = provider.getSigner(WALLET_ADDRESS)
-    identity = new JsonRPCIdentity(provider, WALLET_ADDRESS)
   } else {
     throw Error(
-      'OPERATOR_WALLET_FILEPATH and OPERATOR_WALLET_PASSWORD both need to be defined in environment.'
+      "Unable to fetch the operator's wallet information from the environment."
     )
   }
 
