@@ -15,7 +15,20 @@ import {
   GETH_RPC_URL,
   DEPLOYMENT_MOCK_MEDIATOR,
   RUN_ON_LOCALHOST,
-  OPERATOR_HTTP_PORT
+  OPERATOR_HTTP_PORT,
+  CHAOS_TESTING_MAX_NUMBER_OF_CLIENTS,
+  CHAOS_TESTING_FUND_AMOUNT_ETHER,
+  CHAOS_TESTING_TOKEN_AMOUNT_ETHER,
+  OPERATOR_URL,
+  CHAOS_TESTING_ROUND_HALT,
+  CHAOS_TESTING_PROB_NEW_CLIENT,
+  CHAOS_TESTING_PROB_WITHDRAW,
+  CHAOS_TESTING_PROB_DISPUTE,
+  CHAOS_TESTING_PROB_CANCEL_ORDER,
+  CHAOS_TESTING_PROB_BUY,
+  CHAOS_TESTING_PROB_FAILURE,
+  CHAOS_TESTING_MAX_WITHDRAWAL_WEI,
+  CHAOS_TESTING_MAX_ORDER_AMOUNT_ETH
 } from '../config/environment'
 
 import {
@@ -48,27 +61,25 @@ const E = etherToD
 // Chaos testing configuration
 ////////////////////////////////////////////////
 
-const API_URL = `http://127.0.0.1:${OPERATOR_HTTP_PORT}`
-const MAX_NUMBER_OF_CLIENTS = 10
+const API_URL = `${OPERATOR_URL}:${OPERATOR_HTTP_PORT}`
+const MAX_NUMBER_OF_CLIENTS = CHAOS_TESTING_MAX_NUMBER_OF_CLIENTS
 
-const FUND_AMOUNT_ETHER = D('0.3')
-const TOKEN_AMOUNT_ETHER = D('0.1')
+const FUND_AMOUNT_ETHER = D(CHAOS_TESTING_FUND_AMOUNT_ETHER)
+const TOKEN_AMOUNT_ETHER = D(CHAOS_TESTING_TOKEN_AMOUNT_ETHER)
 
 // After this round the mediator halts
-const ROUND_HALT: number = 4
+const ROUND_HALT: number = CHAOS_TESTING_ROUND_HALT
 
 const ODDS: { [event: string]: number } = {
-  NEW_CLIENT: 0.75,
-  WITHDRAW: 0.5,
-  DISPUTE: 0.25,
-  CONFIRM_WITHDRAWAL: 0.25,
-  CANCEL_ORDER: 0.25,
-  SLEEP: 0.25,
-  BUY: 0.5,
-  FAILURE: 0.05
+  NEW_CLIENT: parseFloat(CHAOS_TESTING_PROB_NEW_CLIENT),
+  WITHDRAW: parseFloat(CHAOS_TESTING_PROB_WITHDRAW),
+  DISPUTE: parseFloat(CHAOS_TESTING_PROB_DISPUTE),
+  CANCEL_ORDER: parseFloat(CHAOS_TESTING_PROB_CANCEL_ORDER),
+  BUY: parseFloat(CHAOS_TESTING_PROB_BUY),
+  FAILURE: parseFloat(CHAOS_TESTING_PROB_FAILURE)
 }
-const MAX_WITHDRAWAL_WEI = 5000000000000000
-const MAX_ORDER_AMOUNT_ETH = D('0.1')
+const MAX_WITHDRAWAL_WEI = CHAOS_TESTING_MAX_WITHDRAWAL_WEI
+const MAX_ORDER_AMOUNT_ETH = D(CHAOS_TESTING_MAX_ORDER_AMOUNT_ETH)
 
 ////////////////////////////////////////////////
 
@@ -410,13 +421,6 @@ async function main() {
           } catch (e) {
             console.info('Problem withdrawing: ' + e)
           }
-
-        // if (eventShouldOccur('SLEEP')) {
-        //
-        //   await exClient.leave()
-        //
-        //   setTimeout(() => exClient.join(), BLOCKS_PER_ROUND * BLOCK_TIME_MS)
-        // }
       }
 
       if (

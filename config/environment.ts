@@ -45,6 +45,7 @@ export const OPERATOR_HTTP_PORT = parseInt(
   process.env.OPERATOR_HTTP_PORT || '8899'
 )
 
+export const OPERATOR_URL = process.env.OPERATOR_URL || 'http://127.0.0.1'
 export const GAS_PRICE = parseInt(process.env.GAS_PRICE!)
 export const GAS_LIMIT = parseInt(process.env.GAS_LIMIT!)
 
@@ -83,3 +84,31 @@ export const DEPLOYMENT_ROUND_SIZE = parseInt(
 
 export const DEPLOYMENT_MOCK_MEDIATOR =
   process.env.DEPLOYMENT_MOCK_MEDIATOR == 'true' ? true : false
+
+export const CHAOS_TESTING_MAX_NUMBER_OF_CLIENTS = parseInt(
+  process.env.CHAOS_TESTING_MAX_NUMBER_OF_CLIENTS || '10'
+)
+export const CHAOS_TESTING_FUND_AMOUNT_ETHER =
+  process.env.CHAOS_TESTING_FUND_AMOUNT_ETHER || '0.3'
+export const CHAOS_TESTING_TOKEN_AMOUNT_ETHER =
+  process.env.CHAOS_TESTING_TOKEN_AMOUNT_ETHER || '0.1'
+export const CHAOS_TESTING_ROUND_HALT = parseInt(
+  process.env.CHAOS_TESTING_ROUND_HALT || '4'
+)
+export const CHAOS_TESTING_PROB_NEW_CLIENT =
+  process.env.CHAOS_TESTING_PROB_NEW_CLIENT || '0.75'
+export const CHAOS_TESTING_PROB_WITHDRAW =
+  process.env.CHAOS_TESTING_PROB_WITHDRAW || '0.5'
+export const CHAOS_TESTING_PROB_DISPUTE =
+  process.env.CHAOS_TESTING_PROB_DISPUTE || '0.25'
+export const CHAOS_TESTING_PROB_CANCEL_ORDER =
+  process.env.CHAOS_TESTING_PROB_CANCEL_ORDER || '0.25'
+export const CHAOS_TESTING_PROB_BUY =
+  process.env.CHAOS_TESTING_PROB_BUY || '0.5'
+export const CHAOS_TESTING_PROB_FAILURE =
+  process.env.CHAOS_TESTING_PROB_FAILURE || '0.05'
+export const CHAOS_TESTING_MAX_WITHDRAWAL_WEI = parseInt(
+  process.env.CHAOS_TESTING_MAX_WITHDRAWAL_WEI || '5000000000000000'
+)
+export const CHAOS_TESTING_MAX_ORDER_AMOUNT_ETH =
+  process.env.CHAOS_TESTING_MAX_ORDER_AMOUNT_ETH || '0.05'
