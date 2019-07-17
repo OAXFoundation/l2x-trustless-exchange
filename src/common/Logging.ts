@@ -7,7 +7,8 @@
 import fs from 'fs'
 import winston from 'winston'
 import { DiscordWebHook } from './logging/DiscordWebHookTransport'
-import { DISCORD_WEBHOOK_URL } from '../../config/environment'
+
+const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL
 
 if (process.env.NODE_ENV !== 'docker') {
   // Winston 2.x requires the log directtory to exist
