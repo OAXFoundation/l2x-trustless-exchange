@@ -32,6 +32,15 @@ describe('IOrderBook', () => {
 
       expect(level).toEqual(orderFixtures.orderBookLevel3Dp1)
     })
+
+    it('works with no orders', () => {
+      const level = marketDepth('L1', [], { decimalPlaces: 1 })
+
+      expect(level).toEqual({
+        asks: [],
+        bids: []
+      })
+    })
   })
 
   describe('level 2', () => {
@@ -44,6 +53,15 @@ describe('IOrderBook', () => {
     it('works with decimals', () => {
       const level = marketDepth('L2', orders, { decimalPlaces: 1 })
       expect(level).toEqual(orderFixtures.orderBookLevel2Dp1)
+    })
+
+    it('works with no orders', () => {
+      const level = marketDepth('L1', [], { decimalPlaces: 1 })
+
+      expect(level).toEqual({
+        asks: [],
+        bids: []
+      })
     })
   })
 
@@ -58,6 +76,15 @@ describe('IOrderBook', () => {
       const level = marketDepth('L1', orders, { decimalPlaces: 1 })
 
       expect(level).toEqual(orderFixtures.orderBookLevel1Dp1)
+    })
+
+    it('works with no orders', () => {
+      const level = marketDepth('L1', [], { decimalPlaces: 1 })
+
+      expect(level).toEqual({
+        asks: [],
+        bids: []
+      })
     })
   })
 

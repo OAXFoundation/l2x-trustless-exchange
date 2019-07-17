@@ -48,8 +48,8 @@ function level1BidAsks(decimalPlaces: number, orders: IOrder[]): MarketDepth {
   const bestAsk = asks[0]
 
   return {
-    bids: [bestBid],
-    asks: [bestAsk]
+    bids: bestBid ? [bestBid] : [],
+    asks: bestAsk ? [bestAsk] : []
   }
 }
 
