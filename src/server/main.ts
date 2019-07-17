@@ -172,11 +172,9 @@ async function main(): Promise<void> {
   const mediatorAsync: MediatorAsync = new MediatorAsync(
     signer,
     mediator,
-    logger
+    logger,
+    { gasLimit: GAS_LIMIT, gasPrice: GAS_PRICE }
   )
-
-  mediatorAsync.setGasLimit(GAS_LIMIT)
-  mediatorAsync.setGasPrice(GAS_PRICE)
 
   const operator = new Operator(identity!, mediatorAsync, provider, metaLedger)
 
