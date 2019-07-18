@@ -131,10 +131,10 @@ export class Operator {
    */
   async admit(clientAddress: Address): Promise<IAuthorizationMessage> {
     await this.metaLedger.register(clientAddress, this.round)
-    const currentRound = await this.getCurrentRound()
+    const roundJoined = await this.metaLedger.roundJoined(clientAddress)
     const authorizationMessage = await this.computeAuthorizationMessage(
       clientAddress,
-      currentRound
+      roundJoined
     )
     return authorizationMessage
   }

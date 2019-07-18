@@ -147,6 +147,16 @@ export class MetaLedger {
     })
   }
 
+  async roundJoined(wallet: Address): Promise<Round> {
+    const account = await this.wallets().findOne({ wallet })
+
+    if (account === null) {
+      throw Error(`Client ${wallet} is not registered`)
+    }
+
+    return account.roundJoined
+  }
+
   async toJSON() {
     return JSON.parse(
       JSON.stringify({

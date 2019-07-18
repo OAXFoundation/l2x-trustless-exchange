@@ -238,6 +238,31 @@ describe('MetaLedger', () => {
     })
   })
 
+  describe('Round joined for user', () => {
+    const wallet = alice.address
+
+    let ledger: MetaLedger
+
+    beforeEach(async () => {
+      ledger = new MetaLedger(LEDGER_CONFIG)
+      await ledger.start()
+    })
+
+    it('returns the round the user is registered into the ledger', async () => {
+      const round = 3
+
+      await ledger.register(wallet, round)
+
+      await expect(ledger.roundJoined(wallet)).resolves.toEqual(round)
+    })
+
+    it('throws when the user has not been registered', async () => {
+      await expect(ledger.roundJoined(wallet)).rejects.toThrow(
+        `Client ${wallet} is not registered`
+      )
+    })
+  })
+
   describe('Crediting deposit for registered user', () => {
     const asset = USD
     const wallet = alice.address
