@@ -58,6 +58,24 @@ describe('Off-chain OperatorBlockchain', () => {
     jest.restoreAllMocks()
   })
 
+  describe('Scenario: admitting a user', () => {
+    it(`Given that a user has already been registered in a round r
+        when admit is called again for a user
+        an authorization message for round r is returned`, async () => {
+      await operator.admit(alice.address)
+      const roundJoined = await operator.getCurrentRound()
+
+      // advance time by 1 round
+      jest.spyOn(mediator, 'getCurrentRound').mockResolvedValue(roundJoined + 1)
+      const currentRound = await operator.getCurrentRound()
+
+      const authMsg = await operator.admit(alice.address)
+
+      expect(currentRound).toEqual(roundJoined + 1)
+      expect(authMsg.round).toEqual(roundJoined)
+    })
+  })
+
   describe('create', () => {
     beforeEach(async () => {
       await metaLedger.register(alice.address, 0)
