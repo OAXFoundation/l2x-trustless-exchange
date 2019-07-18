@@ -222,8 +222,8 @@ export class L2Client {
       this._authorization = existingAccount.authorization
       this._roundJoined = existingAccount.roundJoined
     } else {
-      this._authorization = await this.getAuthorization()
       this._roundJoined = this.round
+      this._authorization = await this.getAuthorization()
 
       await this.saveAccount()
     }
@@ -933,7 +933,7 @@ authorization: ${JSON.stringify(this.authorization)}`)
       authorization,
       this.operatorAddress,
       this.address,
-      this.round
+      this.roundJoined
     )
 
     if (!result) {
