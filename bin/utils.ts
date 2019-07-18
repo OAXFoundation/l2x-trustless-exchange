@@ -19,7 +19,9 @@ export async function loadWalletFromFile(
 
   const password =
     providedPassword == undefined
-      ? await Promptly.prompt(`Enter wallet password for ${filePath}: `)
+      ? await Promptly.prompt(`Enter wallet password for ${filePath}: `, {
+          silent: true
+        })
       : providedPassword
 
   const fileContent = (await fs.readFileSync(filePath)).toString()
