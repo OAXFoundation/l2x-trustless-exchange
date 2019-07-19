@@ -6,7 +6,7 @@
 
 /* eslint-env jest */
 import 'jest'
-import { Mutex } from '../../src/server/Mutex'
+import { Mutex } from '../../src/common/Mutex'
 
 describe('Mutex', () => {
   let mutex: Mutex

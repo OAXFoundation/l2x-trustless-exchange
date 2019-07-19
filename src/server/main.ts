@@ -149,14 +149,14 @@ async function main(): Promise<void> {
     debug: process.env.NODE_ENV !== 'production',
     asyncStackTraces: process.env.NODE_ENV !== 'production',
     log: {
-      warn(message: string) {
-        logger.warn('knex: ' + message)
+      warn(message: any) {
+        logger.warn('knex: ', message)
       },
-      error(message: string) {
-        logger.error('knex: ' + message)
+      error(message: any) {
+        logger.error('knex: ', message)
       },
-      debug(message: string) {
-        logger.debug('knex: ' + message)
+      debug(message: any) {
+        logger.debug('knex: ', message)
       },
       deprecate(method: string, alternative: string) {
         logger.warn('knex: ' + method + ' was superseded by ' + alternative)
@@ -179,12 +179,10 @@ async function main(): Promise<void> {
 
   // Setting up operator
   logger.info('Creating operator.')
-  const mediatorAsync: MediatorAsync = new MediatorAsync(
-    signer,
-    mediator,
-    logger,
-    { gasLimit: GAS_LIMIT, gasPrice: GAS_PRICE }
-  )
+  const mediatorAsync: MediatorAsync = new MediatorAsync(signer, mediator, {
+    gasLimit: GAS_LIMIT,
+    gasPrice: GAS_PRICE
+  })
 
   const operator = new Operator(identity!, mediatorAsync, provider, metaLedger)
 

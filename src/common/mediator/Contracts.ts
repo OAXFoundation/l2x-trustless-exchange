@@ -5,12 +5,15 @@
 // ----------------------------------------------------------------------------
 
 import { safeBigNumberToString, waitForMining } from '../ContractUtils'
-import { Signer, Contract, providers } from 'ethers'
-import { TransactionReceipt } from 'ethers/providers'
+import { Signer, Contract } from 'ethers'
+import {
+  TransactionReceipt,
+  TransactionResponse,
+  TransactionRequest,
+  JsonRpcProvider
+} from 'ethers/providers'
 import { D } from '../BigNumberUtils'
 import { BigNumber } from 'bignumber.js'
-
-import winston from 'winston'
 
 import {
   Address,
@@ -39,11 +42,21 @@ import { Approval, IApproval } from '../types/Approvals'
 import { ETHToken } from '@oax/contracts/wrappers/ETHToken'
 import { IMediatorAsync } from './IMediatorAsync'
 import { Mediator } from '@oax/contracts/wrappers/Mediator'
+import { loggers } from '../../common/Logging'
+import { Mutex } from '../../common/Mutex'
+
+const logger = loggers.get('backend')
+
+function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
 
 export class MediatorAsync implements IMediatorAsync {
-  private readonly contractWithSigner: Contract
   readonly contractAddress: Address
-  private readonly logger?: winston.LoggerInstance
+  readonly _retryLimit = 5
+  readonly _nonceLock = new Mutex()
+
+  private readonly contractWithSigner: Contract
   private methodGasLimit = {
     commit: 200000
   }
@@ -53,7 +66,6 @@ export class MediatorAsync implements IMediatorAsync {
   constructor(
     signer: Signer,
     contract: MediatorMock | Mediator,
-    logger?: winston.LoggerInstance,
     { gasLimit, gasPrice }: { gasLimit: number; gasPrice: number } = {
       gasLimit: 0,
       gasPrice: 0
@@ -61,30 +73,34 @@ export class MediatorAsync implements IMediatorAsync {
   ) {
     this.contractWithSigner = contract.connect(signer)
     this.contractAddress = this.contractWithSigner.address
-    this.logger = logger
     this.gasLimit = gasLimit
     this.gasPrice = gasPrice
 
-    if (this.logger) {
-      this.logger.info(`Gas price for mediator: ${this.gasPrice}`)
-      this.logger.info(`Gas limit for mediator: ${this.gasLimit}`)
-    }
+    logger.info(`Gas price for mediator: ${this.gasPrice}`)
+    logger.info(`Gas limit for mediator: ${this.gasLimit}`)
+  }
+
+  private logTx(tx: TransactionResponse) {
+    logger.info('Transaction sent:', {
+      gasPrice: tx.gasPrice.toString(),
+      gasLimit: tx.gasLimit.toString(),
+      txHash: tx.hash,
+      txNonce: tx.nonce
+    })
   }
 
   private async waitForMiningAndLog(
-    txPromise: Promise<providers.TransactionResponse>
-  ): Promise<providers.TransactionReceipt> {
+    txPromise: Promise<TransactionResponse>
+  ): Promise<TransactionReceipt> {
     const tx = await txPromise
 
-    if (this.logger) {
-      this.logger.info('Transaction sent:', {
-        gasPrice: tx.gasPrice.toString(),
-        gasLimit: tx.gasLimit.toString(),
-        txHash: tx.hash
-      })
-    }
+    this.logTx(tx)
 
     return tx.wait()
+  }
+
+  get retryLimit() {
+    return this._retryLimit
   }
 
   private getGasParams() {
@@ -110,6 +126,134 @@ export class MediatorAsync implements IMediatorAsync {
     return D(await this.contractWithSigner.provider.getBalance(contractAddress))
   }
 
+  async submitAndWaitForTx(
+    func: (opts: TransactionRequest) => Promise<TransactionResponse>
+  ) {
+    let tx = await this.submitTxWithRetry(func, {})
+
+    for (let attempt = 0; attempt < this.retryLimit - 1; attempt++) {
+      try {
+        return await this.pollForMining(tx)
+      } catch (err) {
+        logger.error('Failed to mine transaction: ', {
+          hash: tx.hash,
+          attempt
+        })
+      }
+      tx = await this.submitTxWithRetry(func, {
+        retryTx: tx
+      })
+    }
+    return await this.pollForMining(tx)
+  }
+
+  private async submitTxWithRetry(
+    func: (opts: TransactionRequest) => Promise<TransactionResponse>,
+    { retryTx }: { retryTx?: TransactionResponse }
+  ) {
+    const provider = this.contractWithSigner.provider as JsonRpcProvider
+
+    for (let sub = 0; sub < this.retryLimit; sub++) {
+      try {
+        const tx = await this.submitTx(func, {
+          retryTx
+        })
+        this.logTx(tx)
+        return tx
+      } catch (err) {
+        if (sub != this.retryLimit - 1) {
+          logger.warn('Failed to submit transaction, retrying: ', err.message)
+          // Wait a bit before retrying.
+          await sleep(provider.pollingInterval)
+        } else {
+          logger.error('Failed to submit transaction')
+          throw err
+        }
+      }
+    }
+    // Should never get here.
+    throw Error('Failed to submit transaction')
+  }
+
+  async retryTx(
+    func: (opts: TransactionRequest) => Promise<TransactionResponse>,
+    retryTx: TransactionResponse
+  ) {
+    const opts = {
+      ...this.getGasParams(),
+      nonce: retryTx.nonce,
+      gasPrice: Math.ceil(1.1 * retryTx.gasPrice.toNumber())
+    }
+
+    logger.info('Submitting transaction', opts)
+
+    return func(opts)
+  }
+
+  async newTx(
+    func: (opts: TransactionRequest) => Promise<TransactionResponse>
+  ) {
+    try {
+      await this._nonceLock.lockAsync()
+
+      const provider = this.contractWithSigner.provider as JsonRpcProvider
+      const operatorAddress = await this.contractWithSigner.signer.getAddress()
+      const opts = {
+        ...this.getGasParams(),
+        nonce: await provider.getTransactionCount(operatorAddress, 'pending')
+      }
+
+      logger.info('Submitting transaction', opts)
+
+      // Need to await to not unlock too early.
+      return await func(opts)
+    } finally {
+      this._nonceLock.unlock()
+    }
+  }
+
+  async submitTx(
+    func: (opts: TransactionRequest) => Promise<TransactionResponse>,
+    { retryTx }: { retryTx?: TransactionResponse }
+  ) {
+    if (retryTx === undefined) {
+      return this.newTx(func)
+    } else {
+      return this.retryTx(func, retryTx)
+    }
+  }
+
+  async pollForMining(tx: TransactionResponse): Promise<TransactionReceipt> {
+    const provider = this.contractWithSigner.provider as JsonRpcProvider
+    const startTime = Date.now()
+
+    // pollingInterval is usually set to half the block time, so the following
+    // would cause commit to monitor mining for ~ 10 blocks
+    const endTime = startTime + provider.pollingInterval * 20
+
+    while (Date.now() < endTime) {
+      await sleep(provider.pollingInterval)
+
+      if (!tx.hash) {
+        throw Error('TX has no hash. This should not happen.')
+      }
+
+      const receipt = await provider.getTransactionReceipt(tx.hash)
+
+      if (receipt && receipt.status === 0) {
+        logger.warn('Transaction failed', { receipt })
+        throw Error('Transaction failed')
+      }
+
+      if (receipt !== null) {
+        logger.info('Transaction mined', { hash: tx.hash })
+        return receipt
+      }
+    }
+
+    throw Error('Failed to mine transaction')
+  }
+
   async commit(rootInfo: IRootInfo, tokenAddress: Address) {
     const rootInfoSol = new RootInfoParams(
       rootInfo.content,
@@ -117,9 +261,9 @@ export class MediatorAsync implements IMediatorAsync {
       rootInfo.width
     ).toSol()
 
-    return await this.waitForMiningAndLog(
+    return this.submitAndWaitForTx(opts =>
       this.contractWithSigner.functions.commit(rootInfoSol, tokenAddress, {
-        ...this.getGasParams(),
+        ...opts,
         gasLimit: this.methodGasLimit.commit
       })
     )

@@ -4,7 +4,7 @@
 // See LICENSE file for license details.
 // ----------------------------------------------------------------------------
 import BigNumber from 'bignumber.js'
-import { JsonRpcProvider, TransactionReceipt, Log } from 'ethers/providers'
+import { JsonRpcProvider, Log } from 'ethers/providers'
 import { HashZero } from 'ethers/constants'
 import R from 'ramda'
 
@@ -23,7 +23,7 @@ import {
   Omit
 } from '../../common/types/BasicTypes'
 
-import { Mutex } from '../Mutex'
+import { Mutex } from '../../common/Mutex'
 
 import {
   IRootInfo,
@@ -64,7 +64,6 @@ export class Operator {
   readonly provider: JsonRpcProvider
   private _round: Round = 0
   private _quarter: Quarter = 0
-  private _numCommitRetries = 5
   private metaLedger: MetaLedger
   private eventEmitter: EventEmitter
   private _mediatorCreationBlockNumber = -1
@@ -148,9 +147,10 @@ export class Operator {
     this.eventEmitter.once(eventName, callback)
   }
 
-  async commit(round: Round): Promise<TransactionReceipt[]> {
+  async commit(round: Round): Promise<void> {
     logger.info(`Starting commit at round ${round}.`)
-    const receipts: TransactionReceipt[] = []
+
+    const results = []
 
     for (const asset of this.metaLedger.assets) {
       const rootOnChain = await this.mediator.getCommit(round, asset)
@@ -189,9 +189,14 @@ export class Operator {
       }
 
       try {
-        const receipt = await this.mediator.commit(root, asset)
-        receipts.push(receipt)
-        logger.info(`Commit ok for asset ${asset}.`)
+        const tx = this.mediator.commit(root, asset)
+        results.push(tx)
+
+        tx.then(() => {
+          logger.info(`Commit ok for asset ${asset}.`)
+        })
+
+        logger.info(`Commit started for asset ${asset}.`)
       } catch (err) {
         const quarter = await this.mediator.getCurrentQuarter()
         const msg = `Commit for asset=${asset} round=${round} quarter=${quarter} failed: ${JSON.stringify(
@@ -203,7 +208,7 @@ export class Operator {
       }
     }
 
-    return receipts
+    await Promise.all(results)
   }
 
   async getCurrentRound(): Promise<Round> {
@@ -730,24 +735,9 @@ clientAddress: ${clientAddress}`)
     this.eventEmitter.emit('newQuarterEventReceived')
   }
 
-  async commitWithRetry(round: Round) {
-    for (let attempt = 0; attempt < this._numCommitRetries; attempt++) {
-      try {
-        await this.commit(round)
-        break
-      } catch (err) {
-        if (attempt == this._numCommitRetries - 1) {
-          throw err
-        }
-        logger.error(err)
-        logger.error('Retrying commit')
-      }
-    }
-  }
-
   async goToRound(round: Round) {
     this._round = round
-    await this.commitWithRetry(round)
+    await this.commit(round)
   }
 
   async signFill(fill: IFill): Promise<Signature> {

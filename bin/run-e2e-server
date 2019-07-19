@@ -1,16 +1,24 @@
 #!/usr/bin/env bash
 set -euxo pipefail
 
+OPERATOR_WALLET_FILEPATH="wallet/wallet.bin"
+
+if [ ! -f "$OPERATOR_WALLET_FILEPATH" ]; then
+    echo "Operator wallet file $OPERATOR_WALLET_FILEPATH does not exist."
+    exit 1
+fi
+
 DEPLOYER_ADDRESS="0x$(cat wallet/deploy.bin | jq -r .address)"
 fund-wallet $DEPLOYER_ADDRESS 100e18
 
-OPERATOR_ADDRESS="0x$(cat wallet/wallet.bin | jq -r .address)"
+OPERATOR_ADDRESS="0x$(cat $OPERATOR_WALLET_FILEPATH | jq -r .address)"
 fund-wallet $OPERATOR_ADDRESS 100e18
 
 pnpm run clean-build
 docker_build.sh
 
-echo testtest | deployContracts.ts
+echo testtest | env OPERATOR_WALLET_FILEPATH="$OPERATOR_WALLET_FILEPATH" \
+        deployContracts.ts
 
 # capture token addresses
 CONTRACT_OAXToken=$(cat deploy.json | jq -r .assets.OAX)

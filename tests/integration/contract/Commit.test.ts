@@ -202,4 +202,85 @@ describe('OperatorBlockchain commits the root of the merkle inside the Mediator 
       contractUsedByOperator.commit(root, blockchain.WETHContract.address)
     ).resolves.not.toThrow()
   })
+
+  describe('retries', () => {
+    beforeEach(async () => {
+      await blockchain.skipToNextRound()
+
+      const result = await contractUsedByOperator.getCurrentRound()
+      expect(result).toBe(1)
+    })
+
+    describe('concurrent commits', () => {
+      it('do not require retries', async () => {
+        jest
+          .spyOn(contractUsedByOperator, 'retryLimit', 'get')
+          .mockReturnValue(1)
+        const commits = [blockchain.WETHContract, blockchain.OAXContract].map(
+          token => contractUsedByOperator.commit(root, token.address)
+        )
+        await expect(Promise.all(commits)).resolves.not.toThrow()
+      })
+    })
+
+    describe('when failing to submit transaction', () => {
+      it('retries', async () => {
+        const mocked = jest.spyOn(contractUsedByOperator, 'submitTx')
+        mocked.mockRejectedValueOnce(new Error('Failed to submit transaction'))
+
+        const promise = contractUsedByOperator.commit(
+          root,
+          blockchain.WETHContract.address
+        )
+
+        await expect(promise).resolves.not.toThrow()
+      })
+
+      it('throws if retries exhausted', async () => {
+        const mocked = jest.spyOn(contractUsedByOperator, 'submitTx')
+        mocked.mockRejectedValue(new Error('Failed to submit transaction'))
+
+        const promise = contractUsedByOperator.commit(
+          root,
+          blockchain.WETHContract.address
+        )
+
+        await expect(promise).rejects.toThrow('Failed to submit transaction')
+      })
+    })
+
+    describe('when transaction is not mined', () => {
+      beforeEach(async () => {
+        await blockchain.provider.send('miner_stop', [])
+      })
+
+      afterEach(async () => {
+        await blockchain.provider.send('miner_start', [])
+      })
+
+      it('throws if retries exhausted', async () => {
+        const promise = contractUsedByOperator.commit(
+          root,
+          blockchain.WETHContract.address
+        )
+
+        await expect(promise).rejects.toThrow('Failed to mine transaction')
+      })
+
+      it('retries', async () => {
+        const promise = contractUsedByOperator.commit(
+          root,
+          blockchain.WETHContract.address
+        )
+
+        const pollInterval = blockchain.provider.pollingInterval
+
+        await new Promise(r => setTimeout(r, 30 * pollInterval))
+
+        await blockchain.provider.send('miner_start', [])
+
+        await expect(promise).resolves.not.toThrow()
+      })
+    })
+  })
 })

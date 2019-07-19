@@ -589,7 +589,7 @@ describe('End-to-end', () => {
   describe('halting and recovery', () => {
     it("disable operator's commit", async () => {
       if (doServerSetupInTest()) {
-        jest.spyOn(fixtures.getOperator(), 'commit').mockResolvedValue([])
+        jest.spyOn(fixtures.getOperator(), 'commit').mockResolvedValue()
       } else {
         // stop the operator docker container
         const res = spawnSync('docker', ['stop', 'oax-e2e'])
