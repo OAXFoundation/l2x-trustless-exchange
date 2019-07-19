@@ -125,7 +125,7 @@ importers:
       express: 4.16.4
       get-stdin: 6.0.0
       husky: 1.2.0
-      javascript-typescript-langserver: ^2.11.1
+      javascript-typescript-langserver: ^2.11.3
       jest: 24.7.1
       jest-haste-map: 24.7.1
       jsonapi-serializer: 3.6.4
@@ -2433,7 +2433,7 @@ packages:
     dependencies:
       ansi-color: 0.2.1
       error: 7.0.2
-      xtend: 4.0.1
+      xtend: 4.0.2
     dev: true
     engines:
       node: '>= 0.10.x'
@@ -3181,7 +3181,7 @@ packages:
   /error/7.0.2:
     dependencies:
       string-template: 0.2.1
-      xtend: 4.0.1
+      xtend: 4.0.2
     dev: true
     resolution:
       integrity: sha1-pfdf/02ZJhJt2sDqXcOOaJFTywI=
@@ -4032,7 +4032,7 @@ packages:
     dependencies:
       fs.realpath: 1.0.0
       inflight: 1.0.6
-      inherits: 2.0.3
+      inherits: 2.0.4
       minimatch: 3.0.4
       once: 1.4.0
       path-is-absolute: 1.0.1
@@ -4380,7 +4380,6 @@ packages:
     resolution:
       integrity: sha1-Yzwsg+PaQqUC9SRmAiSA9CCCYd4=
   /inherits/2.0.4:
-    dev: false
     resolution:
       integrity: sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==
   /ini/1.3.5:
@@ -4815,10 +4814,10 @@ packages:
       glob: 7.1.4
       iterare: 1.2.0
       jaeger-client: 3.15.0
-      lodash: 4.17.11
+      lodash: 4.17.15
       mz: 2.7.0
       object-hash: 1.3.1
-      opentracing: 0.14.3
+      opentracing: 0.14.4
       rxjs: 5.5.12
       semaphore-async-await: 1.5.1
       string-similarity: 2.0.0
@@ -5645,6 +5644,10 @@ packages:
   /lodash/4.17.11:
     resolution:
       integrity: sha512-cQKh8igo5QUhZ7lg38DYWAxMvjSAKG0A8wGSVimP07SIUEK2UO+arSRKbRZWtelMtN5V0Hkwh5ryOto/SshYIg==
+  /lodash/4.17.15:
+    dev: true
+    resolution:
+      integrity: sha512-8xOcRHvCjnocdS5cpwXQXVzmmh5e5+saE2QGoeQmbKmRS6J3VQppPOIt0MnmE+4xlZoumy0GPG0D0MVIQbNA1A==
   /log-symbols/2.2.0:
     dependencies:
       chalk: 2.4.2
@@ -6368,12 +6371,12 @@ packages:
     dev: true
     resolution:
       integrity: sha1-ajQUQvCdfYZrwR7QPeHjgo49aqs=
-  /opentracing/0.14.3:
+  /opentracing/0.14.4:
     dev: true
     engines:
       node: '>=0.10'
     resolution:
-      integrity: sha1-I+OtAp+mamU5Jq2+V+g0Rp+FUKo=
+      integrity: sha512-nNnZDkUNExBwEpb7LZaeMeQgvrlO8l4bgY/LvGNZCR0xG/dGWqHqjKrAmR5GUoYo0FIz38kxasvA1aevxWs2CA==
   /optimist/0.6.1:
     dependencies:
       minimist: 0.0.10
@@ -9079,6 +9082,12 @@ packages:
       node: '>=0.4'
     resolution:
       integrity: sha1-pcbVMr5lbiPbgg77lDofBJmNY68=
+  /xtend/4.0.2:
+    dev: true
+    engines:
+      node: '>=0.4'
+    resolution:
+      integrity: sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==
   /y18n/3.2.1:
     dev: true
     resolution:
