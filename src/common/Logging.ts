@@ -54,7 +54,7 @@ if (process.env.NODE_ENV === 'perf') {
     transports: [
       new transports.File({
         filename: 'logs/backend-test.log',
-        level: 'info'
+        level: 'debug'
       })
     ]
   })

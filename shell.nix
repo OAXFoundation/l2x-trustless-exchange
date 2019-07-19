@@ -11,7 +11,15 @@ with import (
 ) { };
 
 let
-  geth = go-ethereum;
+  geth = go-ethereum.overrideAttrs (old: rec {
+    version = "1.8.27";
+    src = fetchFromGitHub {
+      owner = "ethereum";
+      repo = "go-ethereum";
+      rev = "v${version}";
+      sha256 = "1640y7lqy7bvjjgx6wp0cnbw632ls5fj4ixclr819lfz4p5dfhx1";
+    };
+  });
   nodejs = nodejs-10_x;
   pnpmPkg = nodePackages_10_x.pnpm;
   # npm ERR! Unsupported URL Type "link:": link:../../privatePackages/assert-project

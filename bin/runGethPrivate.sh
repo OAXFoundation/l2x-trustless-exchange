@@ -29,7 +29,7 @@ geth --datadir $DATA_DIR init $DATA_DIR/genesis_poa.json
 ADDRESS_LIST=$(geth --verbosity 0 --datadir $DATA_DIR account list | cut -d ' ' -f 3 | cut -c2- | rev | cut -c2- | rev | sed -e 's/^/0x/' | sed '$!s/$/,/' | tr -d '\n')
 
 # Run geth
-args="--nousb --networkid 88 --datadir ${DATA_DIR} --unlock ${ADDRESS_LIST} --password ${DATA_DIR}/testpassword.txt --rpc --rpccorsdomain '*' --rpcport 8545 --rpcapi 'admin,db,shh,txpool,personal,eth,net,web3,debug'  --mine --minerthreads 1 --maxpeers 0 --nodiscover --verbosity 3"
+args="--nousb --networkid 88 --datadir ${DATA_DIR} --unlock ${ADDRESS_LIST} --password ${DATA_DIR}/testpassword.txt --rpc --rpccorsdomain '*' --rpcport 8545 --rpcapi 'admin,db,shh,txpool,personal,eth,net,web3,debug,miner'  --mine --minerthreads 1 --maxpeers 0 --nodiscover --verbosity 3"
 
 if [ "$1" == "--docker" ];
 then
@@ -37,8 +37,8 @@ then
    docker network rm oax-test-network 2> /dev/null
    docker network create oax-test-network 2> /dev/null
    DATA_DIR2=/ethereum
-   args="--nousb --networkid 88 --datadir ${DATA_DIR2} --unlock ${ADDRESS_LIST} --password ${DATA_DIR2}/testpassword.txt --rpc --rpccorsdomain '*' --rpcport 8545 --rpcapi 'admin,db,shh,txpool,personal,eth,net,web3,debug'  --mine --minerthreads 1 --maxpeers 0 --nodiscover --verbosity 3"
+   args="--nousb --networkid 88 --datadir ${DATA_DIR2} --unlock ${ADDRESS_LIST} --password ${DATA_DIR2}/testpassword.txt --rpc --rpccorsdomain '*' --rpcport 8545 --rpcapi 'admin,db,shh,txpool,personal,eth,net,web3,debug,miner'  --mine --minerthreads 1 --maxpeers 0 --nodiscover --verbosity 3"
    docker run -it --name oax-test-geth --network oax-test-network -p 8545:8545 -v ${DATA_DIR}:/ethereum ethereum/client-go:v1.8.22 --rpcaddr 0.0.0.0 --rpcvhosts '*' $args
 else
-   geth --nousb --networkid 88 --datadir $DATA_DIR --unlock $ADDRESS_LIST --password $DATA_DIR/testpassword.txt --rpc --rpccorsdomain '*' --rpcport 8545 --rpcapi "admin,db,shh,txpool,personal,eth,net,web3,debug" --mine --minerthreads 1 --maxpeers 0 --nodiscover
+   geth --nousb --networkid 88 --datadir $DATA_DIR --unlock $ADDRESS_LIST --password $DATA_DIR/testpassword.txt --rpc --rpccorsdomain '*' --rpcport 8545 --rpcapi "admin,db,shh,txpool,personal,eth,net,web3,debug,miner" --mine --minerthreads 1 --maxpeers 0 --nodiscover
 fi

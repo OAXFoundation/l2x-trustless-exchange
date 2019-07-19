@@ -116,7 +116,7 @@ export class L2Client {
         'Mediator',
         identity
       ) as Mediator
-      this.mediator = new MediatorAsync(identity, mediator, logger)
+      this.mediator = new MediatorAsync(identity, mediator)
     } else {
       this.mediator = options.mediator as IMediatorAsync
     }

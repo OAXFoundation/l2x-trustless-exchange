@@ -69,7 +69,7 @@ import { MetaLedger } from '../../common/accounting/MetaLedger'
 import { Operator } from '../operator/Operator'
 import { ISignedFill } from '../../common/types/Fills'
 import { SignedApprovalSerDe } from '../../common/types/SerDe'
-import { Mutex } from '../Mutex'
+import { Mutex } from '../../common/Mutex'
 import { IAuthorizationMessage } from '../../common/types/SmartContractTypes'
 
 const logger = loggers.get('backend')

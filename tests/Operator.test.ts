@@ -104,22 +104,6 @@ describe('Off-chain OperatorBlockchain', () => {
       const commit = await operator.getCommit(USD, 1)
       expect(mockedCommit).toHaveBeenCalledWith(commit, USD)
     })
-
-    it('retries failed commit', async () => {
-      mockedCommit
-        .mockRejectedValueOnce(new Error('Commit failed'))
-        .mockResolvedValue({} as TransactionReceipt)
-
-      await operator.goToRound(1)
-      // 2 tokens, 1 retry => 3 times
-      expect(mockedCommit).toHaveBeenCalledTimes(3)
-    })
-
-    it('throws if retries exhausted', async () => {
-      mockedCommit.mockRejectedValue(new Error('Commit failed'))
-
-      await expect(operator.goToRound(1)).rejects.toThrow()
-    })
   })
 
   describe('handles deposits', () => {
