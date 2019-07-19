@@ -15,18 +15,17 @@ const Ethers = require('ethers')
 
 import {
   GETH_RPC_URL,
-  DEPLOYMENT_WALLET_FILEPATH,
-  DEPLOYMENT_WALLET_PASSWORD,
   OPERATOR_WALLET_FILEPATH,
-  DEPLOYMENT_ROUND_SIZE,
-  DEPLOYMENT_GAS_PRICE,
-  DEPLOYMENT_GAS_LIMIT,
-  DEPLOYMENT_MOCK_MEDIATOR,
-  RUN_ON_LOCALHOST,
-  INDEX_DEPLOYER_SIGNER_LOCAL,
-  INDEX_OPERATOR_SIGNER_LOCAL
+  USE_GETH_SIGNER
 } from '../config/environment'
 import { loadWalletFromFile } from './utils'
+
+const MOCK_MEDIATOR = process.env.MOCK_MEDIATOR == 'true' ? true : false
+const GAS_LIMIT = 5.5e6
+const GAS_PRICE = 10e9
+const DEPLOYMENT_WALLET_FILEPATH = 'wallet/deploy.bin'
+const DEPLOYMENT_WALLET_PASSWORD = 'testtest'
+const ROUND_SIZE = 32
 
 async function run() {
   // Connect to blockchain node
@@ -35,29 +34,20 @@ async function run() {
 
   console.log(`Deploying at ${GETH_RPC_URL}`)
 
-  let transactionOptions: any
-
-  if (DEPLOYMENT_GAS_PRICE === 0) {
-    transactionOptions = {}
-    console.log('No gas price specified for deployment.')
-  } else {
-    transactionOptions = {
-      gasPrice: DEPLOYMENT_GAS_PRICE,
-      gasLimit: DEPLOYMENT_GAS_LIMIT
-    }
-    console.log(`Gas price for deployment:${transactionOptions.gasPrice}`)
-    console.log(`Gas limit for deployment: ${transactionOptions.gasLimit}`)
+  const transactionOptions = {
+    gasPrice: GAS_PRICE,
+    gasLimit: GAS_LIMIT
   }
 
   // Load wallets
   let deployerSigner = null
   let operatorSigner = null
 
-  if (RUN_ON_LOCALHOST) {
+  if (USE_GETH_SIGNER) {
     console.log('Loading test wallets from geth...')
 
-    deployerSigner = provider.getSigner(INDEX_DEPLOYER_SIGNER_LOCAL)
-    operatorSigner = provider.getSigner(INDEX_OPERATOR_SIGNER_LOCAL)
+    deployerSigner = provider.getSigner(1)
+    operatorSigner = provider.getSigner(2)
   } else {
     console.log('Loading wallets from disk...')
     const deployerWallet = await loadWalletFromFile(
@@ -93,9 +83,9 @@ async function run() {
   // Deploy the mediator contract
   const mediatorContractAddress = await deployMediator(
     operatorAddress,
-    DEPLOYMENT_ROUND_SIZE,
+    ROUND_SIZE,
     deployerSigner,
-    DEPLOYMENT_MOCK_MEDIATOR
+    MOCK_MEDIATOR
   )
 
   const mediatorContract = await loadContract(
@@ -145,15 +135,13 @@ async function deployToken(
 
   console.log(`Deploying token ${name}.`)
   const tx = factory.getDeployTransaction()
-  if (DEPLOYMENT_GAS_PRICE !== 0) {
-    tx.gasLimit = DEPLOYMENT_GAS_LIMIT
-    tx.gasPrice = DEPLOYMENT_GAS_PRICE
-    console.log(
-      `Using gas configuration from environment. GAS_LIMIT=${
-        tx.gasLimit
-      }, GAS_PRICE=${tx.gasPrice}.`
-    )
-  }
+  tx.gasLimit = GAS_LIMIT
+  tx.gasPrice = GAS_PRICE
+  console.log(
+    `Using gas configuration GAS_LIMIT=${tx.gasLimit}, GAS_PRICE=${
+      tx.gasPrice
+    }.`
+  )
 
   const txSentPromise = signer.sendTransaction(tx)
   const txSent = await txSentPromise
@@ -191,16 +179,14 @@ async function deployMediator(
   )
   let tx = factory.getDeployTransaction(roundSize, operatorAddress)
 
-  if (DEPLOYMENT_GAS_PRICE !== 0) {
-    tx.gasLimit = DEPLOYMENT_GAS_LIMIT
-    tx.gasPrice = DEPLOYMENT_GAS_PRICE
+  tx.gasLimit = GAS_LIMIT
+  tx.gasPrice = GAS_PRICE
 
-    console.log(
-      `Using gas configuration from environment. GAS_LIMIT=${
-        tx.gasLimit
-      }, GAS_PRICE=${tx.gasPrice}.`
-    )
-  }
+  console.log(
+    `Using gas configuration GAS_LIMIT=${tx.gasLimit}, GAS_PRICE=${
+      tx.gasPrice
+    }.`
+  )
 
   const txSentPromise = signer.sendTransaction(tx)
   const txSent = await txSentPromise

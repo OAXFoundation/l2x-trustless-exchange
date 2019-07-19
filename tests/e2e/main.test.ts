@@ -14,7 +14,7 @@ import {
   GETH_RPC_URL,
   CONTRACTS,
   FEE_AMOUNT_WEI,
-  OPERATOR_HTTP_PORT
+  OPERATOR_URL
 } from '../../config/environment'
 import {
   Address,
@@ -43,8 +43,6 @@ import { L2ClientForTest } from '../libs/L2ClientForTest'
 function doServerSetupInTest() {
   return process.env.DOCKER_E2E == undefined
 }
-
-const SERVER_URL = `http://127.0.0.1:${OPERATOR_HTTP_PORT}`
 
 async function skipToNextRound(
   mediator: MediatorAsync,
@@ -240,10 +238,10 @@ describe('End-to-end', () => {
         mediator: CONTRACTS.Mediator
       }
 
-      aliceL2 = new L2ClientForTest(alice, SERVER_URL, clientOptions)
+      aliceL2 = new L2ClientForTest(alice, OPERATOR_URL, clientOptions)
       await aliceL2.init()
 
-      bobL2 = new L2ClientForTest(bob, SERVER_URL, clientOptions)
+      bobL2 = new L2ClientForTest(bob, OPERATOR_URL, clientOptions)
       await bobL2.init()
 
       const assetRegistry = new AssetRegistry()

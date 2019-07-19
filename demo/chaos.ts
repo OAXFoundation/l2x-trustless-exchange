@@ -9,27 +9,7 @@ import BigNumber from 'bignumber.js'
 import { JsonRpcProvider, JsonRpcSigner } from 'ethers/providers'
 import { D, etherToD, toEthersBn } from '@oax/common/BigNumberUtils'
 
-import {
-  DEPLOYMENT_WALLET_PASSWORD,
-  DEPLOYMENT_WALLET_FILEPATH,
-  GETH_RPC_URL,
-  DEPLOYMENT_MOCK_MEDIATOR,
-  RUN_ON_LOCALHOST,
-  OPERATOR_HTTP_PORT,
-  CHAOS_TESTING_MAX_NUMBER_OF_CLIENTS,
-  CHAOS_TESTING_FUND_AMOUNT_ETHER,
-  CHAOS_TESTING_TOKEN_AMOUNT_ETHER,
-  OPERATOR_URL,
-  CHAOS_TESTING_ROUND_HALT,
-  CHAOS_TESTING_PROB_NEW_CLIENT,
-  CHAOS_TESTING_PROB_WITHDRAW,
-  CHAOS_TESTING_PROB_DISPUTE,
-  CHAOS_TESTING_PROB_CANCEL_ORDER,
-  CHAOS_TESTING_PROB_BUY,
-  CHAOS_TESTING_PROB_FAILURE,
-  CHAOS_TESTING_MAX_WITHDRAWAL_WEI,
-  CHAOS_TESTING_MAX_ORDER_AMOUNT_ETH
-} from '../config/environment'
+import { GETH_RPC_URL, OPERATOR_URL } from '../config/environment'
 
 import {
   AssetRegistry,
@@ -42,6 +22,43 @@ import { L2ClientChaos } from '../tests/libs/L2ClientForTest'
 import { loadWalletFromFile, sleep } from '../bin/utils'
 import { waitForMining } from '../src/common/ContractUtils'
 import { Address } from '../src/common/types/BasicTypes'
+
+////////////////////////////////////////////////
+// Chaos testing configuration
+////////////////////////////////////////////////
+
+const MOCK_MEDIATOR = process.env.MOCK_MEDIATOR == 'true'
+
+// Use empty wallet filepath to sign with geth node.
+const DEPLOYER_WALLET_FILEPATH = ''
+const DEPLOYER_WALLET_PASSWORD = 'testtest'
+
+const MAX_NUMBER_OF_CLIENTS = 10
+const FUND_AMOUNT_ETHER = D('0.3')
+const TOKEN_AMOUNT_ETHER = D('0.1')
+// After this round the mediator halts
+const ROUND_HALT = 4
+const PROB_NEW_CLIENT = 0.75
+const PROB_WITHDRAW = 0.5
+const PROB_DISPUTE = 0.25
+const PROB_CANCEL_ORDER = 0.25
+const PROB_BUY = 0.5
+const PROB_FAILURE = 0.05
+const MAX_WITHDRAWAL_WEI = 5e15
+const MAX_ORDER_AMOUNT_ETH = D('0.05')
+
+////////////////////////////////////////////////
+
+const USE_GETH_SIGNER = !DEPLOYER_WALLET_FILEPATH
+
+const ODDS: { [event: string]: number } = {
+  NEW_CLIENT: PROB_NEW_CLIENT,
+  WITHDRAW: PROB_WITHDRAW,
+  DISPUTE: PROB_DISPUTE,
+  CANCEL_ORDER: PROB_CANCEL_ORDER,
+  BUY: PROB_BUY,
+  FAILURE: PROB_FAILURE
+}
 
 interface Client {
   l2Client: L2ClientChaos
@@ -56,32 +73,6 @@ provider.pollingInterval = 20
 let clients: Client[] = []
 
 const E = etherToD
-
-////////////////////////////////////////////////
-// Chaos testing configuration
-////////////////////////////////////////////////
-
-const API_URL = `${OPERATOR_URL}:${OPERATOR_HTTP_PORT}`
-const MAX_NUMBER_OF_CLIENTS = CHAOS_TESTING_MAX_NUMBER_OF_CLIENTS
-
-const FUND_AMOUNT_ETHER = D(CHAOS_TESTING_FUND_AMOUNT_ETHER)
-const TOKEN_AMOUNT_ETHER = D(CHAOS_TESTING_TOKEN_AMOUNT_ETHER)
-
-// After this round the mediator halts
-const ROUND_HALT: number = CHAOS_TESTING_ROUND_HALT
-
-const ODDS: { [event: string]: number } = {
-  NEW_CLIENT: parseFloat(CHAOS_TESTING_PROB_NEW_CLIENT),
-  WITHDRAW: parseFloat(CHAOS_TESTING_PROB_WITHDRAW),
-  DISPUTE: parseFloat(CHAOS_TESTING_PROB_DISPUTE),
-  CANCEL_ORDER: parseFloat(CHAOS_TESTING_PROB_CANCEL_ORDER),
-  BUY: parseFloat(CHAOS_TESTING_PROB_BUY),
-  FAILURE: parseFloat(CHAOS_TESTING_PROB_FAILURE)
-}
-const MAX_WITHDRAWAL_WEI = CHAOS_TESTING_MAX_WITHDRAWAL_WEI
-const MAX_ORDER_AMOUNT_ETH = D(CHAOS_TESTING_MAX_ORDER_AMOUNT_ETH)
-
-////////////////////////////////////////////////
 
 function eventShouldOccur(eventName: string): boolean {
   if (ODDS[eventName] === undefined) throw Error('Unknown chance')
@@ -98,14 +89,14 @@ async function getDeployerSigner(): Promise<JsonRpcSigner> {
   let deployerSigner: JsonRpcSigner
 
   // Fetch local signer
-  if (RUN_ON_LOCALHOST) {
+  if (USE_GETH_SIGNER) {
     deployerSigner = await provider.getSigner(1)
   } else {
     // Fetch testnet signer
 
     let deployerWallet = await loadWalletFromFile(
-      DEPLOYMENT_WALLET_FILEPATH!,
-      DEPLOYMENT_WALLET_PASSWORD
+      DEPLOYER_WALLET_FILEPATH,
+      DEPLOYER_WALLET_PASSWORD
     )
     deployerSigner = await deployerWallet.connect(provider)
   }
@@ -118,9 +109,7 @@ async function main() {
 
   const deployConfig = JSON.parse(fs.readFileSync('deploy.json').toString())
 
-  const mediatorContractName = DEPLOYMENT_MOCK_MEDIATOR
-    ? 'MediatorMockChaos'
-    : 'Mediator'
+  const mediatorContractName = MOCK_MEDIATOR ? 'MediatorMockChaos' : 'Mediator'
 
   const mediator = getContract(
     deployConfig.mediator,
@@ -130,7 +119,7 @@ async function main() {
 
   async function createClient(): Promise<Client> {
     const id = new PrivateKeyIdentity(undefined, provider)
-    const l2Client = new L2ClientChaos(id, API_URL, {
+    const l2Client = new L2ClientChaos(id, OPERATOR_URL, {
       operatorAddress: deployConfig.operator,
       mediator: deployConfig.mediator
     })
