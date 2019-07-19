@@ -16,7 +16,11 @@ echo testtest | deployContracts.ts
 CONTRACT_OAXToken=$(cat deploy.json | jq -r .assets.OAX)
 CONTRACT_WETHToken=$(cat deploy.json | jq -r .assets.WETH)
 CONTRACT_Mediator=$(cat deploy.json | jq -r .mediator)
-FEE_AMOUNT_ETHER=$(cat .env.example | grep FEE_AMOUNT_ETHER | cut -d = -f 2)
+source <(grep FEE_AMOUNT_ETHER .env.example)
+source <(grep GAS_PRICE .env.example)
+source <(grep GAS_LIMIT .env.example)
+source <(grep OPERATOR_URL .env.example)
+
 
 docker stop oax-e2e || true
 docker rm oax-e2e || true
@@ -25,14 +29,17 @@ docker run --init -it \
         -v $(pwd)/wallet:/app/mount \
         -p 8899:8899 \
         -e GETH_RPC_URL="http://oax-test-geth:8545" \
-        -e WALLET_FILEPATH="/app/mount/wallet.bin" \
-        -e WALLET_PASSWORD="testtest" \
+        -e OPERATOR_WALLET_FILEPATH="/app/mount/wallet.bin" \
+        -e OPERATOR_WALLET_PASSWORD="testtest" \
         -e STORAGE_DIR="/app/storage" \
         -e FEE_AMOUNT_ETHER=$FEE_AMOUNT_ETHER \
         -e CONTRACT_OAXToken=$CONTRACT_OAXToken \
         -e CONTRACT_ETHToken=$CONTRACT_WETHToken \
         -e CONTRACT_Mediator=$CONTRACT_Mediator \
-        -e IN_MEMORY_DB=1\
+        -e OPERATOR_URL=$OPERATOR_URL \
+        -e GAS_LIMIT=$GAS_LIMIT \
+        -e GAS_PRICE=$GAS_PRICE \
+        -e IN_MEMORY_DB=1 \
         -e E2E_TEST=1 \
         --network oax-test-network \
         --name oax-e2e \

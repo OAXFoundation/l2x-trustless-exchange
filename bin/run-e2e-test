@@ -6,7 +6,9 @@ export CONTRACT_OAXToken=$(cat deploy.json | jq -r .assets.OAX)
 export CONTRACT_ETHToken=$(cat deploy.json | jq -r .assets.WETH)
 export CONTRACT_Mediator=$(cat deploy.json | jq -r .mediator)
 export OPERATOR_ADDRESS=$(cat deploy.json | jq -r .operator)
-export FEE_AMOUNT_ETHER=$(cat .env.example | grep FEE_AMOUNT_ETHER | cut -d = -f 2)
+source <(grep FEE_AMOUNT_ETHER .env.example)
+source <(grep OPERATOR_URL .env.example)
+source <(grep GETH_RPC_URL .env.example)
 export DOCKER_E2E=1
 
 export TEST_TIMEOUT=30000

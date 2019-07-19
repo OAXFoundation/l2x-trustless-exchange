@@ -10,6 +10,7 @@ import { providers, Wallet, utils as EthersUtils } from 'ethers'
 import { HTTPServer } from './HTTPServer'
 import {
   GETH_RPC_URL,
+  OPERATOR_PORT,
   OPERATOR_WALLET_FILEPATH,
   OPERATOR_WALLET_PASSWORD,
   CONTRACTS,
@@ -17,9 +18,7 @@ import {
   FEE_AMOUNT_WEI,
   GAS_LIMIT,
   GAS_PRICE,
-  RUN_ON_LOCALHOST,
-  INDEX_OPERATOR_SIGNER_LOCAL,
-  OPERATOR_HTTP_PORT
+  USE_GETH_SIGNER
 } from '../../config/environment'
 import { loggers } from '../common/Logging'
 import fs from 'fs'
@@ -34,7 +33,7 @@ import { JsonRPCIdentity } from '../../src/common/identity/jsonRPCIdentity'
 
 // Globals
 const logger = loggers.get('backend')
-const options = { port: OPERATOR_HTTP_PORT }
+const options = { port: OPERATOR_PORT }
 
 let server: HTTPServer | null = null
 let persistence: knex | null = null
@@ -43,7 +42,7 @@ async function main(): Promise<void> {
   logger.info('****************************************')
   logger.info('Starting...')
   logger.info(`Ethereum network: ${GETH_RPC_URL}.`)
-  logger.info(`Server running on port ${OPERATOR_HTTP_PORT}.`)
+  logger.info(`Server running on port ${OPERATOR_PORT}.`)
   logger.info('****************************************')
 
   process.on('SIGINT', () => {
@@ -67,9 +66,9 @@ async function main(): Promise<void> {
   // Load encrypted wallet from disk
   let signer = null
   let identity = null
-  if (RUN_ON_LOCALHOST) {
-    logger.info(`Loading operator wallet from local ethereum node...`)
-    signer = provider.getSigner(INDEX_OPERATOR_SIGNER_LOCAL)
+  if (USE_GETH_SIGNER) {
+    logger.warn(`Loading operator wallet from local ethereum node...`)
+    signer = provider.getSigner(2)
     identity = new JsonRPCIdentity(provider, await signer.getAddress())
   } else if (OPERATOR_WALLET_FILEPATH !== '') {
     logger.info(

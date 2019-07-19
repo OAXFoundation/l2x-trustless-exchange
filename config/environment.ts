@@ -28,12 +28,14 @@ function ensureConfigExist(configName: string) {
 ////////////////////////////////////////////////////////////////////////////////
 
 ensureConfigExist('GETH_RPC_URL')
+ensureConfigExist('OPERATOR_URL')
 ensureConfigExist('STORAGE_DIR')
 ensureConfigExist('FEE_AMOUNT_ETHER')
 ensureConfigExist('GAS_LIMIT')
 ensureConfigExist('GAS_PRICE')
 
 export const GETH_RPC_URL = process.env.GETH_RPC_URL!
+export const OPERATOR_URL = process.env.OPERATOR_URL!
 export const STORAGE_DIR = process.env.STORAGE_DIR!
 export const CONTRACTS: { [name: string]: string | undefined } = {
   OAXToken: process.env.CONTRACT_OAXToken,
@@ -41,74 +43,20 @@ export const CONTRACTS: { [name: string]: string | undefined } = {
   Mediator: process.env.CONTRACT_Mediator
 }
 export const FEE_AMOUNT_WEI = etherToWei(D(process.env.FEE_AMOUNT_ETHER!))
-export const OPERATOR_HTTP_PORT = parseInt(
-  process.env.OPERATOR_HTTP_PORT || '8899'
-)
 
-export const OPERATOR_URL = process.env.OPERATOR_URL || 'http://127.0.0.1'
-export const GAS_PRICE = parseInt(process.env.GAS_PRICE!)
-export const GAS_LIMIT = parseInt(process.env.GAS_LIMIT!)
+export const GAS_PRICE = D(process.env.GAS_PRICE!).toNumber()
+export const GAS_LIMIT = D(process.env.GAS_LIMIT!).toNumber()
 
 export const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL
-
-export const INDEX_DEPLOYER_SIGNER_LOCAL = 1
-export const INDEX_OPERATOR_SIGNER_LOCAL = 2
 
 export const OPERATOR_WALLET_FILEPATH = process.env.OPERATOR_WALLET_FILEPATH
 export const OPERATOR_WALLET_PASSWORD = process.env.OPERATOR_WALLET_PASSWORD
 
-export const RUN_ON_LOCALHOST: boolean =
-  GETH_RPC_URL.indexOf('127.0.0.1') >= 0 ||
-  GETH_RPC_URL.indexOf('localhost') >= 0
+export const OPERATOR_PORT = parseInt(OPERATOR_URL.split(':').slice(-1)[0])
+if (!OPERATOR_PORT) {
+  throw Error(
+    `Could not determine operator port, check OPERATOR_URL: ${OPERATOR_URL}`
+  )
+}
 
-////////////////////////////////////////////////////////////////////////////////
-// Deployment
-////////////////////////////////////////////////////////////////////////////////
-
-ensureConfigExist('DEPLOYMENT_ROUND_SIZE')
-ensureConfigExist('DEPLOYMENT_GAS_LIMIT')
-ensureConfigExist('DEPLOYMENT_GAS_PRICE')
-
-export const DEPLOYMENT_GAS_LIMIT = parseInt(process.env.DEPLOYMENT_GAS_LIMIT!)
-export const DEPLOYMENT_GAS_PRICE = parseInt(process.env.DEPLOYMENT_GAS_PRICE!)
-
-export const DEPLOYMENT_WALLET_FILEPATH = process.env.DEPLOYMENT_WALLET_FILEPATH
-export const DEPLOYMENT_WALLET_PASSWORD = process.env.DEPLOYMENT_WALLET_PASSWORD
-export const DEPLOYMENT_ROUND_SIZE = parseInt(
-  process.env.DEPLOYMENT_ROUND_SIZE!
-)
-
-////////////////////////////////////////////////////////////////////////////////
-// Chaos testing
-////////////////////////////////////////////////////////////////////////////////
-
-export const DEPLOYMENT_MOCK_MEDIATOR =
-  process.env.DEPLOYMENT_MOCK_MEDIATOR == 'true' ? true : false
-
-export const CHAOS_TESTING_MAX_NUMBER_OF_CLIENTS = parseInt(
-  process.env.CHAOS_TESTING_MAX_NUMBER_OF_CLIENTS || '10'
-)
-export const CHAOS_TESTING_FUND_AMOUNT_ETHER =
-  process.env.CHAOS_TESTING_FUND_AMOUNT_ETHER || '0.3'
-export const CHAOS_TESTING_TOKEN_AMOUNT_ETHER =
-  process.env.CHAOS_TESTING_TOKEN_AMOUNT_ETHER || '0.1'
-export const CHAOS_TESTING_ROUND_HALT = parseInt(
-  process.env.CHAOS_TESTING_ROUND_HALT || '4'
-)
-export const CHAOS_TESTING_PROB_NEW_CLIENT =
-  process.env.CHAOS_TESTING_PROB_NEW_CLIENT || '0.75'
-export const CHAOS_TESTING_PROB_WITHDRAW =
-  process.env.CHAOS_TESTING_PROB_WITHDRAW || '0.5'
-export const CHAOS_TESTING_PROB_DISPUTE =
-  process.env.CHAOS_TESTING_PROB_DISPUTE || '0.25'
-export const CHAOS_TESTING_PROB_CANCEL_ORDER =
-  process.env.CHAOS_TESTING_PROB_CANCEL_ORDER || '0.25'
-export const CHAOS_TESTING_PROB_BUY =
-  process.env.CHAOS_TESTING_PROB_BUY || '0.5'
-export const CHAOS_TESTING_PROB_FAILURE =
-  process.env.CHAOS_TESTING_PROB_FAILURE || '0.05'
-export const CHAOS_TESTING_MAX_WITHDRAWAL_WEI = parseInt(
-  process.env.CHAOS_TESTING_MAX_WITHDRAWAL_WEI || '5000000000000000'
-)
-export const CHAOS_TESTING_MAX_ORDER_AMOUNT_ETH =
-  process.env.CHAOS_TESTING_MAX_ORDER_AMOUNT_ETH || '0.05'
+export const USE_GETH_SIGNER = !OPERATOR_WALLET_FILEPATH
