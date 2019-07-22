@@ -134,13 +134,3 @@ export class PrematureWithdrawalError extends CustomError {
     super(message)
   }
 }
-
-// ------------------------------
-// AUDIT ERRORS
-// ------------------------------
-
-export class AuditError extends CustomError {
-  constructor(message?: string) {
-    super(message)
-  }
-}

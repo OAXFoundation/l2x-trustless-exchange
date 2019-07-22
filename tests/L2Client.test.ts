@@ -534,6 +534,35 @@ describe('How the client interacts with the Operator and the Blockchain', () => 
         expect(disputeMethod).toHaveBeenCalled()
       })
     })
+
+    describe('Given the user is in their first round', () => {
+      beforeEach(async () => {
+        await mockTransportJoinResponse(
+          aliceTransport,
+          operatorId,
+          mediatorAlice.contractAddress,
+          alice.round,
+          alice.address
+        )
+
+        await alice.join()
+
+        const currentRound = alice.round
+        const roundJoined = alice.roundJoined
+
+        expect(currentRound).toEqual(roundJoined)
+      })
+
+      it(`fails when audit() is called`, async () => {
+        const auditEvent = alice.waitForEvent('auditComplete')
+
+        await alice.audit()
+
+        const auditResult = await auditEvent
+
+        expect(auditResult.result).toEqual('fail')
+      })
+    })
   })
 
   describe('Making a deposit to the mediator', () => {
