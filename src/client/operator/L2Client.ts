@@ -54,7 +54,6 @@ import { ERC20 } from '@oax/contracts/wrappers/ERC20'
 import { Mediator } from '@oax/contracts/wrappers/Mediator'
 import { MetaLedger } from '@oax/common/accounting/MetaLedger'
 import { IL2Order } from '@oax/common/types/ExchangeTypes'
-import { AuditError } from '@oax/common/Errors'
 
 const logger = loggers.get('frontend')
 
@@ -437,8 +436,12 @@ export class L2Client {
   protected async audit(): Promise<void> {
     const round = this.round
 
-    if (round === 0) {
-      throw new AuditError()
+    if (this.round === this.roundJoined) {
+      this.eventEmitter.emit('auditComplete', {
+        result: 'fail',
+        message: 'Unable to audit in first round or round 0'
+      })
+      return
     }
 
     logger.info(`Client ${this.address} auditing for round ${round}`)

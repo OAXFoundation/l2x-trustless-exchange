@@ -36,7 +36,6 @@ import {
   ApprovalsFunctions,
   IApproval
 } from '../../../src/common/types/Approvals'
-import { AuditError } from '../../../src/common/Errors'
 import { L2ClientForTest } from '../../libs/L2ClientForTest'
 
 describe('How the client interacts with other components', () => {
@@ -614,7 +613,13 @@ describe('How the client interacts with other components', () => {
 
     describe('How the client performs an audit', () => {
       it('fails when the client tries to audit during round 0', async () => {
-        await expect(alice.audit()).rejects.toThrow(new AuditError())
+        const auditEvent = alice.waitForEvent('auditComplete')
+
+        await alice.audit()
+
+        const auditResult = await auditEvent
+
+        expect(auditResult.result).toEqual('fail')
       })
 
       describe('when round > 0', () => {
