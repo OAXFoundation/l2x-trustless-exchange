@@ -737,7 +737,7 @@ async function requestWithdrawal(ctx, symbol, amount) {
     amount
   )
 
-  log(JSON.stringify(result, null, 4))
+  log("Withdrawal Initialized!") 
 }
 
 async function confirmWithdrawal(ctx, symbol) {
