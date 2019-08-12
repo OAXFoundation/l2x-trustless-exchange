@@ -2,7 +2,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)
 
 
-# Trustless Exchange
+# Layer 2 Trustless Exchange (L2X)
 
 This is an implementation of the OAX L2X protocol as a full-stack high-performance, scalable, trustless exchange.
 
