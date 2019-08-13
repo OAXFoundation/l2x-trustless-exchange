@@ -19,3 +19,4 @@ isolate-*.log
 misc/vagrant/.vagrant/
 wallet/
 config.json
+.history/
