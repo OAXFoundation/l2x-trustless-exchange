@@ -9,7 +9,7 @@ This is an implementation of the OAX L2X protocol as a full-stack high-performan
 ## Documentation
 * [Getting Started with the OAX Testnet](#getting-started-with-the-oax-testnet)
 * [Architecture](./docs/Architecture.md)
-* [L2X Protocol Specification](./docs/l2x-protocol-33c7d42.pdf)
+* [L2X Protocol Specification](./docs/l2x-specification.pdf)
 * [Exchange Client Library](./docs/Client_ExchangeClient.md)
 * [Operator Client Library](./docs/Client_L2Client.md)
 * [Client CLI](./docs/Client_Cli.md)
