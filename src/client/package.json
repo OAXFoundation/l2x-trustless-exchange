@@ -1,7 +1,7 @@
 {
   "name": "@oax/client",
   "description": "OAX Trustless Client",
-  "version": "0.3.6",
+  "version": "0.3.8",
   "author": "OAX Foundation",
   "license": "MIT",
   "main": "index.js",
