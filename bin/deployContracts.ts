@@ -16,16 +16,19 @@ const Ethers = require('ethers')
 import {
   GETH_RPC_URL,
   OPERATOR_WALLET_FILEPATH,
-  USE_GETH_SIGNER
+  USE_GETH_SIGNER,
+  GAS_LIMIT,
+  GAS_PRICE,
+  ROUND_SIZE
 } from '../config/environment'
 import { loadWalletFromFile } from './utils'
 
 const MOCK_MEDIATOR = process.env.MOCK_MEDIATOR == 'true' ? true : false
-const GAS_LIMIT = 5.5e6
-const GAS_PRICE = 10e9
-const DEPLOYMENT_WALLET_FILEPATH = 'wallet/deploy.bin'
-const DEPLOYMENT_WALLET_PASSWORD = 'testtest'
-const ROUND_SIZE = 32
+//Only for /bin/deployContracs.ts
+export const DEPLOYMENT_WALLET_FILEPATH = process.env
+  .DEPLOYMENT_WALLET_FILEPATH!
+export const DEPLOYMENT_WALLET_PASSWORD = process.env
+  .DEPLOYMENT_WALLET_PASSWORD!
 
 async function run() {
   // Connect to blockchain node
