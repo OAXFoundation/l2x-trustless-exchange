@@ -33,6 +33,7 @@ ensureConfigExist('STORAGE_DIR')
 ensureConfigExist('FEE_AMOUNT_ETHER')
 ensureConfigExist('GAS_LIMIT')
 ensureConfigExist('GAS_PRICE')
+ensureConfigExist('ROUND_SIZE')
 
 export const GETH_RPC_URL = process.env.GETH_RPC_URL!
 export const OPERATOR_URL = process.env.OPERATOR_URL!
@@ -42,11 +43,13 @@ export const CONTRACTS: { [name: string]: string | undefined } = {
   ETHToken: process.env.CONTRACT_ETHToken,
   Mediator: process.env.CONTRACT_Mediator
 }
+
 export const FEE_AMOUNT_WEI = etherToWei(D(process.env.FEE_AMOUNT_ETHER!))
 
 export const GAS_PRICE = D(process.env.GAS_PRICE!).toNumber()
 export const GAS_LIMIT = D(process.env.GAS_LIMIT!).toNumber()
 
+export const ROUND_SIZE = D(process.env.ROUND_SIZE!).toNumber()
 export const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL
 
 export const OPERATOR_WALLET_FILEPATH = process.env.OPERATOR_WALLET_FILEPATH
